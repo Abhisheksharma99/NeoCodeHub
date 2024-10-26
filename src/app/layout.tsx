@@ -14,9 +14,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "TechStackInfo - ransforming Ideas into Digital Reality",
+  title: "TechStackInfo - Transforming Ideas into Digital Reality",
   description: "Your Trusted Partner in Digital Development Elevating Businesses with Cutting-Edge Solutions",
-  
+
   // Open Graph metadata
   openGraph: {
     title: "TechStackInfo - Transforming Ideas into Digital Reality",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   // Other important meta tags
   keywords: "tech stack information, technology stack analysis, software development technologies, web development services, software engineering best practices, front-end development, back-end development, cloud computing solutions, database management systems, programming languages comparison, full-stack development, agile development methodologies, DevOps practices, microservices architecture, mobile app development, IT consulting services, digital transformation strategies, tech industry trends, startup technology solutions, enterprise software solutions, best tech stacks for startups, how to choose the right technology stack, advantages of using modern technology stacks, trends in web development technologies 2024, effective software development methodologies", // Add relevant keywords for your site
   robots: "index, follow", // Ensure search engines index and follow links
-  authors: [{name: 'TechStackInfo', url: 'https://tech-stack-info.vercel.app/'}] // Author of the website
+  authors: [{ name: 'TechStackInfo', url: 'https://tech-stack-info.vercel.app/' }] // Author of the website
 };
 
 export default function RootLayout({
@@ -55,11 +55,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
-  );
+      <head>
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+            <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+              <link rel="manifest" href="/site.webmanifest" />
+              </head>
+              <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+              >
+                {children}
+              </body>
+            </html>
+            );
 }
