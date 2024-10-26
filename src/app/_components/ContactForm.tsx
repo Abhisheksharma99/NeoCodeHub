@@ -4,21 +4,25 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import Image from 'next/image';
-import Discuss from '../assets/Discuss.svg'
+import Discuss from '../assets/Discuss.svg';
+import Invoice from "../assets/Invoice-bro.svg"
+import PhoneInput from 'react-phone-input-2';
 
 interface ContactFormPopupProps {
     headerText: string,
     showProjectType?: boolean,
+    getQuote?: boolean,
     isOpen: boolean,
     onClose: () => void
 }
 
-const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, showProjectType = false, isOpen, onClose }) => {
+const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, getQuote= false, showProjectType = false, isOpen, onClose }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         projectType: '',
-        message: ''
+        message: '',
+        phone: ''
     })
 
     const projectTypes = [
@@ -31,11 +35,12 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, showPro
         'IoT Solutions',
         'Cybersecurity',
         'Cloud Services',
+        'SaaS Application',
         'Other'
     ]
     const formRef = useRef<HTMLDivElement>(null)
     const resetForm = () => {
-        setFormData({ name: '', email: '', message: '', projectType: '' })
+        setFormData({ name: '', email: '', message: '', projectType: '', phone: '' })
     }
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -58,6 +63,10 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, showPro
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
+    const handlePhoneChange = (value: string) => {
+        setFormData(prevState => ({ ...prevState, phone: value }))
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         console.log('Form submitted:', formData)
@@ -72,7 +81,7 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, showPro
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm"
+                    className={`fixed inset-0 z-50 md:mt-0 ml-0 shadow-2xl flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm ${showProjectType ? 'mt-64 md:mt-0' : ''}`}
                 >
                     <motion.div
                         ref={formRef}
@@ -80,7 +89,7 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, showPro
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
                         transition={{ type: 'spring', damping: 15 }}
-                        className="relative w-full max-w-4xl bg-white md:mt-4 mt-80 rounded-lg shadow-2xl overflow-hidden flex flex-col md:flex-row"
+                        className="relative w-full max-w-4xl bg-white md:mt-4 rounded-lg shadow-2xl overflow-hidden flex flex-col md:flex-row"
                     >
                         <button
                             type="button"
@@ -93,7 +102,7 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, showPro
 
                         <div className="w-full md:w-1/2 h-48 md:h-auto relative">
                             <Image
-                                src={Discuss}
+                                src={getQuote ? Invoice : Discuss}
                                 alt="Contact Us"
                                 fill
                                 style={{ objectFit: 'cover' }}
@@ -136,6 +145,23 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, showPro
                                         placeholder="your@email.com"
                                     />
                                 </div>
+                                {getQuote && (
+                                    <div>
+                                    <PhoneInput
+                                        country={'in'}
+                                        value={formData.phone}
+                                        onChange={handlePhoneChange}
+                                        inputProps={{
+                                            name: 'phone',
+                                            required: true,
+                                            className: `outline-none focus:shadow-lg border-black focus:border-b-2 focus:border-black w-full p-2 border-b`,
+                                            placeholder: 'Enter Phone No.',
+                                        }}
+                                        containerClass="w-full"
+                                        buttonStyle={{ width: 45, borderBottom: '1px solid black', background: 'white' }}
+                                    />
+                                </div>
+                                )}
                                 {showProjectType && (
                                     <div>
                                         <label htmlFor="projectType" className="block text-sm font-medium text-gray-700 mb-1">
@@ -146,7 +172,7 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, showPro
                                             name="projectType"
                                             value={formData.projectType}
                                             onChange={handleChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-transparent transition-all text-sm"
+                                            className="w-full px-3 py-2 border-b border-black focus:border-b-2 focus:shadow-lg bg-white transition-all text-sm"
                                         >
                                             <option value="">Select a project type</option>
                                             {projectTypes.map((type) => (

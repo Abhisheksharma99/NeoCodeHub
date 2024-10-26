@@ -60,7 +60,7 @@ const Footer = () => {
               Planning your next project?
             </div>
             <div className="mt-4">
-            <ContactButton headerText="Get a free quote for your project today!!" btnText={'Get a Free Quote'} />
+            <ContactButton getQuote={true} headerText="Get a free quote for your project today!!" btnText={'Get a Free Quote'} />
             </div>
           </div>
         </section>

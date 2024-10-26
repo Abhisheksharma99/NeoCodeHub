@@ -8,9 +8,10 @@ interface ContactButtonProps {
   btnText: string;
   headerText: string;
   showProjectType?: boolean;
+  getQuote?: boolean;
 }
 
-const ContactButton: React.FC<ContactButtonProps> = ({ btnText, headerText, showProjectType }) => {
+const ContactButton: React.FC<ContactButtonProps> = ({ btnText, headerText, showProjectType, getQuote }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleOpenPopup = () => setIsPopupOpen(true);
@@ -30,6 +31,7 @@ const ContactButton: React.FC<ContactButtonProps> = ({ btnText, headerText, show
         isOpen={isPopupOpen} 
         headerText={headerText} 
         showProjectType={showProjectType} 
+        getQuote={getQuote}
         onClose={handleClosePopup} 
       />
     </>
