@@ -1,0 +1,7 @@
+# Allow all crawlers access to the entire site
+User-agent: *
+Disallow:
+
+# Optionally, you can block specific paths if needed
+# For example, to block a specific admin path:
+# Disallow: /admin/
