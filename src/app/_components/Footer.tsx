@@ -80,7 +80,7 @@ const Footer = () => {
 
               <hr className="my-4 border-gray-300" />
               <p className="text-center">
-                TechStackInfo is a leading software and website development
+                NeoCodeHub is a leading software and website development
                 company dedicated to transforming ideas into innovative digital
                 solutions. With a commitment to excellence and a passion for
                 technology, we specialize in crafting tailored software
@@ -125,18 +125,18 @@ const Footer = () => {
                 <FaEnvelope className="mr-2" />
                 <a
                   className="text-decoration-none font-bold text-dark"
-                  href="mailto:sales@techstackinfo.com"
+                  href="mailto:sales@NeoCodeHub.com"
                 >
-                  sales@techstackinfo.com
+                  sales@NeoCodeHub.com
                 </a>
               </p>
               <p className="flex items-center justify-center mb-2">
                 <FaEnvelope className="mr-2" />
                 <a
                   className="text-decoration-none font-bold text-dark"
-                  href="mailto:info@techstackinfo.com"
+                  href="mailto:info@NeoCodeHub.com"
                 >
-                  info@techstackinfo.com
+                  info@NeoCodeHub.com
                 </a>
               </p>
               <p className="flex items-center justify-center mb-2">
@@ -157,9 +157,9 @@ const Footer = () => {
             className="text-dark font-bold"
             target="_blank"
             rel="noopener noreferrer"
-            href="https://www.techstackinfo.in/"
+            href="https://www.NeoCodeHub.in/"
           >
-            TechStackInfo
+            NeoCodeHub
           </a>
         </div>
         <div className="text-center pb-3 font-bold">

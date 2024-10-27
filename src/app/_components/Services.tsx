@@ -57,7 +57,7 @@ export default function Services() {
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">Our Services</h1>
         <div className="max-w-3xl mx-auto mb-16">
           <p className="text-lg text-center mb-4">
-            At TechStackInfo, we offer a wide range of cutting-edge services to meet your digital needs. Our expert team is dedicated to delivering high-quality solutions tailored to your business.
+            At NeoCodeHub, we offer a wide range of cutting-edge services to meet your digital needs. Our expert team is dedicated to delivering high-quality solutions tailored to your business.
           </p>
         </div>
 

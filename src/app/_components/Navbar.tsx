@@ -81,7 +81,7 @@ const NavbarAndHero = () => {
           <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
             <Image
               src={TsiLogo}
-              alt="TechStackInfo Logo"
+              alt="NeoCodeHub Logo"
               height={180}
               width={300}
               priority // Ensure it loads first

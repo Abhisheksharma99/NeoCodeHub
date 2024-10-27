@@ -15,7 +15,7 @@ const timeline = [
     year: 2020,
     title: 'Company Founded',
     description:
-      'TechStackInfo was founded to transform innovative ideas into digital realities...',
+      'NeoCodeHub was founded to transform innovative ideas into digital realities...',
     service: {
       title: 'Web Development',
       description:
@@ -131,7 +131,7 @@ export default function AboutUs() {
         <section className="max-w-3xl mx-auto mb-16">
           <article>
             <p className="text-lg text-center mb-4">
-              At <strong>TechStackInfo</strong>, we transform ideas into digital solutions. Our experts create
+              At <strong>NeoCodeHub</strong>, we transform ideas into digital solutions. Our experts create
               cutting-edge technology for businesses.
             </p>
             <p className="text-lg text-center mb-4">
