@@ -1,7 +1,10 @@
-# Allow all crawlers access to the entire site
 User-agent: *
-Disallow:
+Allow: /
 
-# Optionally, you can block specific paths if needed
-# For example, to block a specific admin path:
-# Disallow: /admin/
+# Disallow crawling of administrative areas
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://www.neocodehub.com/sitemap.xml
