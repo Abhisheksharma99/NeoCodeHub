@@ -34,3 +34,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+fonts/Fira Sans Extra Condensed.ttf
+pdf/logo-black.pdf
+pdf/logo-color.pdf
+pdf/logo-no-background.pdf
+pdf/logo-white.pdf
+png/logo-black.png
+png/logo-color.png
+png/logo-no-background.png
+png/logo-white.png
+svg/logo-black.svg
+svg/logo-color.svg
+svg/logo-no-background.svg
+svg/logo-white.svg
