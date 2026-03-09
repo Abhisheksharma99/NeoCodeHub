@@ -4,9 +4,7 @@ import WebImage from "../assets/Web Design.png";
 import Expertise from "../assets/Expertise.svg";
 import Innovation from "../assets/Innovation.svg";
 import Customer from "../assets/Customer relationship management-bro.svg";
-import { Card, ServiceData } from './Card';
-
-
+import { Card, ServiceData } from "./Card";
 
 const services: ServiceData[] = [
   {
@@ -52,12 +50,18 @@ const chooseUs: ServiceData[] = [
 
 export default function Services() {
   return (
-    <div id="Services" className="text-black">
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">Our Services</h1>
-        <div className="max-w-3xl mx-auto mb-16">
-          <p className="text-lg text-center mb-4">
-            At NeoCodeHub, we offer a wide range of cutting-edge services to meet your digital needs. Our expert team is dedicated to delivering high-quality solutions tailored to your business.
+    <section id="Services" className="relative">
+      <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <span className="section-badge">What We Do</span>
+          <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
+            Our Services
+          </h2>
+          <p className="text-neutral-400 text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
+            At NeoCodeHub, we offer a wide range of cutting-edge services to
+            meet your digital needs. Our expert team is dedicated to delivering
+            high-quality solutions tailored to your business.
           </p>
         </div>
 
@@ -65,9 +69,14 @@ export default function Services() {
           {services.map((service, index) => (
             <Card key={index} {...service} />
           ))}
-        </div>  
-        <div className="mt-16 text-center">
-          <h2 className="text-3xl font-bold mb-8">Why Choose Us?</h2>
+        </div>
+
+        {/* Why Choose Us */}
+        <div className="mt-28 text-center">
+          <span className="section-badge">Our Strengths</span>
+          <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight text-neutral-900 mb-12">
+            Why Choose Us?
+          </h2>
           <div className="flex flex-wrap -mx-4">
             {chooseUs.map((service, index) => (
               <Card key={index} {...service} />
@@ -75,6 +84,6 @@ export default function Services() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

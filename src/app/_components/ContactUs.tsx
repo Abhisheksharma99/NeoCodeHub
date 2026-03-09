@@ -11,207 +11,253 @@ import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 
 const icons = [
-    { name: 'React', src: <FaReact /> },
-    { name: 'Node.js', src: <FaNode /> },
-    { name: 'Angular', src: <FaAngular /> },
-    { name: 'Python', src: <FaPython /> },
-    { name: 'Database', src: <FaDatabase /> },
+  { name: 'React', src: <FaReact /> },
+  { name: 'Node.js', src: <FaNode /> },
+  { name: 'Angular', src: <FaAngular /> },
+  { name: 'Python', src: <FaPython /> },
+  { name: 'Database', src: <FaDatabase /> },
 ]
+
 interface FormErrors {
-    name: string,
-    email: string,
-    phone: string,
-    message: string
+  name: string,
+  email: string,
+  phone: string,
+  message: string
 }
+
 export default function ContactUs() {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        message: ''
-    })
-    const [errors, setErrors] = useState<FormErrors>({
-        name: '', email: '', phone: '', message: ''
-    })
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [isSubmitted, setIsSubmitted] = useState(false)
-    const [activeIcon, setActiveIcon] = useState(0)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  })
+  const [errors, setErrors] = useState<FormErrors>({
+    name: '', email: '', phone: '', message: ''
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [activeIcon, setActiveIcon] = useState(0)
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setActiveIcon((prevIcon) => (prevIcon + 1) % icons.length)
-        }, 3000)
-        return () => clearInterval(interval)
-    }, [])
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIcon((prevIcon) => (prevIcon + 1) % icons.length)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
 
-    const validateForm = () => {
-        const formErrors: FormErrors = { name: '', email: '', phone: '', message: '' }
-        if (!formData.name.trim()) formErrors.name = "Name is required"
-        if (!formData.email.trim()) formErrors.email = "Email is required"
-        else if (!/\S+@\S+\.\S+/.test(formData.email)) formErrors.email = "Email is invalid"
-        if (!formData.phone.trim()) formErrors.phone = "Phone number is required"
-        if (!formData.message.trim()) formErrors.message = "Message is required"
-        setErrors(formErrors)
-        return Object.keys(formErrors).length === 0
+  const validateForm = () => {
+    const formErrors: FormErrors = { name: '', email: '', phone: '', message: '' }
+    if (!formData.name.trim()) formErrors.name = "Name is required"
+    if (!formData.email.trim()) formErrors.email = "Email is required"
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) formErrors.email = "Email is invalid"
+    if (!formData.phone.trim()) formErrors.phone = "Phone number is required"
+    if (!formData.message.trim()) formErrors.message = "Message is required"
+    setErrors(formErrors)
+    return Object.keys(formErrors).length === 0
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prevState => ({ ...prevState, [name]: value }))
+    if (errors.name) {
+      setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
     }
+  }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target
-        setFormData(prevState => ({ ...prevState, [name]: value }))
-        if (errors.name) {
-            setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
-        }
+  const handlePhoneChange = (value: string) => {
+    setFormData(prevState => ({ ...prevState, phone: value }))
+    if (errors.phone) {
+      setErrors(prevErrors => ({ ...prevErrors, phone: '' }))
     }
+  }
 
-    const handlePhoneChange = (value: string) => {
-
-        setFormData(prevState => ({ ...prevState, phone: value }))
-        if (errors.phone) {
-            setErrors(prevErrors => ({ ...prevErrors, phone: '' }))
-        }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (validateForm()) {
+      setIsSubmitting(true)
+      try {
+        await emailjs.send(
+          'YOUR_SERVICE_ID',
+          'YOUR_TEMPLATE_ID',
+          formData,
+          'YOUR_USER_ID'
+        )
+        setIsSubmitted(true)
+        setFormData({ name: '', email: '', phone: '', message: '' })
+      } catch (error) {
+        console.error('Error sending email:', error)
+        alert('Failed to send message. Please try again.')
+      }
+      setIsSubmitting(false)
     }
+  }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (validateForm()) {
-            setIsSubmitting(true)
-            try {
-                await emailjs.send(
-                    'YOUR_SERVICE_ID',
-                    'YOUR_TEMPLATE_ID',
-                    formData,
-                    'YOUR_USER_ID'
-                )
-                setIsSubmitted(true)
-                setFormData({ name: '', email: '', phone: '', message: '' })
-            } catch (error) {
-                console.error('Error sending email:', error)
-                alert('Failed to send message. Please try again.')
-            }
-            setIsSubmitting(false)
-        }
-    }
+  return (
+    <section id="Contact" className="relative">
+      {/* Background accent */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-neutral-100 rounded-full blur-[120px] opacity-50 pointer-events-none" />
 
-    return (
-        <div id='Contact' className="container mx-auto px-4 py-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">Contact Us</h1>
-            <div className="flex flex-col lg:flex-row items-start">
-                <div className="w-full lg:w-1/4 mb-8 lg:mb-0">
-                    <div className="flex lg:flex-col items-center justify-center lg:justify-start space-x-4 lg:space-x-0 lg:space-y-4 group relative">
-                        {icons.map((icon, index) => (
-                            <motion.div
-                                key={index}
-                                className="relative"
-                                initial={{ opacity: 0.5, scale: 0.9 }}
-                                animate={activeIcon === index ? { opacity: 1, scale: 1.1 } : { opacity: 0.5, scale: 0.9 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <div className="transition-colors duration-300 ease-in-out h-16">
-                                    <div className="w-12 h-12 flex items-center justify-center" style={{ fontSize: '50px' }}>
-                                        <div className="group-hover:bg-black group-hover:rounded-md transition duration-300 ease-in-out p-2">
-                                            <div className="group-hover:filter group-hover:invert">
-                                                {icon.src}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-                <div className="w-full lg:w-3/4">
-                    <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-1/2 mb-8 md:mb-0 md:pr-4">
-                            <h2 className="text-3xl font-bold mb-4">Want to discuss your idea?</h2>
-                            <p className="mb-4">Hi, We are excited to hear about your project.</p>
-                            <Image src={contactUs} alt="Contact Us" width={350} height={150} className="mb-4" />
-                            <p>Drop us a line and we will connect you to our experts.</p>
-                        </div>
-                        <div className="w-full bg-white shadow-2xl p-6 md:w-1/2 md:pl-4">
-                            <h3 className="text-xl font-bold mb-4">We are here to help you.</h3>
-                            <AnimatePresence>
-                                {!isSubmitted ? (
-                                    <motion.form
-                                        onSubmit={handleSubmit}
-                                        className="space-y-4"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                    >
-                                        <div>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value={formData.name}
-                                                onChange={handleChange}
-                                                placeholder="Your Name*"
-                                                className={`outline-none focus:shadow-lg border-black focus:border-b-2 focus:border-black w-full p-2 border-b ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
-                                                required
-                                            />
-                                            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-                                        </div>
-                                        <div>
-                                            <input
-                                                type="email"
-                                                name="email"
-                                                value={formData.email}
-                                                onChange={handleChange}
-                                                placeholder="Email Address*"
-                                                className={`outline-none focus:shadow-lg focus:border-b-2 focus:border-black w-full p-2 border-b border-black ${errors.email ? 'border-red-500' : 'border-black-300'}`}
-                                                required
-                                            />
-                                            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-                                        </div>
-                                        <div>
-                                            <PhoneInput
-                                                country={'in'}
-                                                value={formData.phone}
-                                                onChange={handlePhoneChange}
-                                                inputProps={{
-                                                    name: 'phone',
-                                                    required: true,
-                                                    className: `outline-none focus:shadow-lg border-black focus:border-b-2 focus:border-black w-full p-2 border-b`,
-                                                    placeholder: 'Enter Phone No.',
-                                                }}
-                                                containerClass="w-full"
-                                                buttonStyle={{ width: 45, borderBottom: '1px solid black', background: 'white' }}
-                                            />
-                                        </div>
-                                        <div>
-                                            <textarea
-                                                name="message"
-                                                value={formData.message}
-                                                onChange={handleChange}
-                                                placeholder="How we can help you?"
-                                                rows={2}
-                                                className={`outline-none focus:shadow-lg border-black focus:border-b-2 focus:border-black w-full p-2 border-b ${errors.message ? 'border-red-500' : 'border-gray-300'}`}
-                                                required
-                                            ></textarea>
-                                            {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}
-                                        </div>
-                                        <Button
-                                            type="submit"
-                                            disabled={isSubmitting}
-                                            text={isSubmitting ? 'Sending...' : 'Discuss Project'}
-                                            btnClass="mb-4 font-medium text-sm px-4 py-2 rounded-full"
-                                        />
-                                    </motion.form>
-                                ) : (
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="text-center"
-                                    >
-                                        <p className="text-green-600 font-bold text-xl mb-4">Thank you for your message!</p>
-                                        <p>We will get back to you soon.</p>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28 relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <span className="inline-block px-4 py-1.5 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-neutral-500 mb-6 border border-neutral-200/80">
+            Get In Touch
+          </span>
+          <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
+            Contact Us
+          </h2>
         </div>
-    )
+
+        <div className="flex flex-col lg:flex-row items-start gap-8 max-w-5xl mx-auto">
+          {/* Left: Tech Icons */}
+          <div className="w-full lg:w-48 shrink-0">
+            <div className="flex lg:flex-col items-center justify-center gap-3">
+              {icons.map((icon, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0.4, scale: 0.85 }}
+                  animate={activeIcon === index
+                    ? { opacity: 1, scale: 1.1 }
+                    : { opacity: 0.4, scale: 0.85 }
+                  }
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className={`w-14 h-14 flex items-center justify-center text-3xl rounded-2xl transition-all duration-300 ${
+                    activeIcon === index
+                      ? 'bg-neutral-900 text-white shadow-lg shadow-neutral-900/20'
+                      : 'bg-white/60 text-neutral-400 border border-neutral-100'
+                  }`}>
+                    {icon.src}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Center + Right: Info & Form */}
+          <div className="flex-1 flex flex-col md:flex-row gap-8">
+            {/* Info */}
+            <div className="w-full md:w-1/2">
+              <h3 className="text-2xl font-heading font-bold tracking-tight text-neutral-900 mb-3">
+                Want to discuss your idea?
+              </h3>
+              <p className="text-neutral-500 mb-6 leading-relaxed">
+                Hi, We are excited to hear about your project.
+              </p>
+              <Image
+                src={contactUs}
+                alt="Contact Us"
+                width={320}
+                height={140}
+                className="mb-6 drop-shadow-sm"
+              />
+              <p className="text-neutral-400 text-sm">
+                Drop us a line and we will connect you to our experts.
+              </p>
+            </div>
+
+            {/* Form */}
+            <div className="w-full md:w-1/2">
+              <div className="glass-card p-6 md:p-8">
+                <h3 className="text-lg font-heading font-bold tracking-tight text-neutral-900 mb-6">
+                  We are here to help you.
+                </h3>
+                <AnimatePresence>
+                  {!isSubmitted ? (
+                    <motion.form
+                      onSubmit={handleSubmit}
+                      className="space-y-5"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <div>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          placeholder="Your Name*"
+                          className={`form-input-modern ${errors.name ? 'border-b-red-400' : ''}`}
+                          required
+                        />
+                        {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
+                      </div>
+                      <div>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          placeholder="Email Address*"
+                          className={`form-input-modern ${errors.email ? 'border-b-red-400' : ''}`}
+                          required
+                        />
+                        {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
+                      </div>
+                      <div>
+                        <PhoneInput
+                          country={'in'}
+                          value={formData.phone}
+                          onChange={handlePhoneChange}
+                          inputProps={{
+                            name: 'phone',
+                            required: true,
+                            className: 'form-input-modern !pl-12',
+                            placeholder: 'Enter Phone No.',
+                          }}
+                          containerClass="w-full"
+                          buttonStyle={{
+                            width: 42,
+                            borderBottom: '1.5px solid #e5e5e5',
+                            background: 'transparent',
+                            border: 'none',
+                            borderRadius: 0,
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <textarea
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
+                          placeholder="How can we help you?"
+                          rows={2}
+                          className={`form-input-modern resize-none ${errors.message ? 'border-b-red-400' : ''}`}
+                          required
+                        ></textarea>
+                        {errors.message && <p className="text-red-400 text-xs mt-1.5">{errors.message}</p>}
+                      </div>
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        text={isSubmitting ? 'Sending...' : 'Discuss Project'}
+                        btnClass="text-sm"
+                      />
+                    </motion.form>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-center py-8"
+                    >
+                      <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <p className="text-neutral-900 font-heading font-bold text-lg mb-1">Thank you!</p>
+                      <p className="text-neutral-400 text-sm">We will get back to you soon.</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }

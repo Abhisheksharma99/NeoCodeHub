@@ -20,19 +20,19 @@ const ContactButton: React.FC<ContactButtonProps> = ({ btnText, headerText, show
   return (
     <>
       <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
         onClick={handleOpenPopup}
-        className="shining-button px-6 py-3 bg-black text-white font-semibold rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-opacity-50 transition-all"
+        className="shining-button px-6 py-3 bg-neutral-900 text-white font-heading font-semibold text-sm tracking-tight rounded-full focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 transition-all hover:bg-neutral-800"
       >
         {btnText}
       </motion.button>
-      <ContactFormPopup 
-        isOpen={isPopupOpen} 
-        headerText={headerText} 
-        showProjectType={showProjectType} 
+      <ContactFormPopup
+        isOpen={isPopupOpen}
+        headerText={headerText}
+        showProjectType={showProjectType}
         getQuote={getQuote}
-        onClose={handleClosePopup} 
+        onClose={handleClosePopup}
       />
     </>
   );

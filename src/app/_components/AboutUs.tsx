@@ -97,7 +97,6 @@ const values: ServiceData[] = [
 export default function AboutUs() {
   const [selectedYear, setSelectedYear] = useState(timeline[timeline.length - 1]);
 
-  // UseCallback ensures button click handler is stable between renders
   const handleYearSelect = useCallback((yearIndex: number) => {
     setSelectedYear(timeline[yearIndex]);
   }, []);
@@ -108,10 +107,10 @@ export default function AboutUs() {
         <button
           key={item.year}
           aria-pressed={selectedYear.year === item.year}
-          className={`px-2 md:px-4 py-2 rounded-full transition-colors duration-300 ${
+          className={`relative px-4 md:px-6 py-2.5 rounded-full text-sm font-heading font-semibold tracking-tight transition-all duration-300 ${
             selectedYear.year === item.year
-              ? 'bg-black text-white shining-button'
-              : 'bg-white-200 border border-black-500 text-black hover:bg-white-300 hover:border-black'
+              ? 'bg-neutral-900 text-white shadow-lg shadow-neutral-900/20 shining-button'
+              : 'bg-white/70 backdrop-blur-sm border border-neutral-200 text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 hover:bg-white/90'
           }`}
           onClick={() => handleYearSelect(index)}
         >
@@ -122,65 +121,87 @@ export default function AboutUs() {
   );
 
   return (
-    <div id="About" className="ms-4 me-4 text-black">
-      <div className="container mx-auto px-4 py-16">
-        <header className="text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-8">About Us</h1>
-        </header>
-
-        <section className="max-w-3xl mx-auto mb-16">
-          <article>
-            <p className="text-lg text-center mb-4">
-              At <strong>NeoCodeHub</strong>, we transform ideas into digital solutions. Our experts create
-              cutting-edge technology for businesses.
-            </p>
-            <p className="text-lg text-center mb-4">
-              Since our founding in 2020, we have stayed at the forefront of web, AI, and mobile development,
-              empowering businesses to grow with technology.
-            </p>
-          </article>
-        </section>
-
-        <section aria-labelledby="journey-title" className="mb-16">
-          <h2 id="journey-title" className="text-3xl font-bold text-center mb-12">
-            Our Journey & Services
+    <section id="About" className="relative">
+      <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <span className="section-badge">Our Story</span>
+          <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
+            About Us
           </h2>
-          <div className="flex justify-center items-center space-x-2 md:space-x-4 mb-8 overflow-x-auto py-4">
+        </div>
+
+        <div className="max-w-3xl mx-auto mb-20">
+          <p className="text-lg text-center text-neutral-500 leading-relaxed mb-4">
+            At <strong className="text-neutral-900 font-semibold">NeoCodeHub</strong>, we transform ideas into digital solutions. Our experts create
+            cutting-edge technology for businesses.
+          </p>
+          <p className="text-lg text-center text-neutral-500 leading-relaxed">
+            Since our founding in 2020, we have stayed at the forefront of web, AI, and mobile development,
+            empowering businesses to grow with technology.
+          </p>
+        </div>
+
+        {/* Journey Timeline */}
+        <div className="mb-24">
+          <h3 className="text-2xl md:text-3xl font-bold font-heading tracking-tight text-center mb-10 text-neutral-900">
+            Our Journey & Services
+          </h3>
+
+          {/* Year Buttons */}
+          <div className="flex justify-center items-center gap-2 md:gap-3 mb-10 overflow-x-auto py-2 px-4">
             {yearButtons}
           </div>
+
+          {/* Timeline Content */}
           <AnimatePresence mode="wait">
-            <motion.article
+            <motion.div
               key={selectedYear.year}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className="bg-white-100 p-8 rounded-lg shadow-2xl"
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="glass-card p-8 md:p-10 max-w-3xl mx-auto"
             >
               <div className="mb-6">
-                <h3 className="text-2xl font-bold mb-4">{selectedYear.title}</h3>
-                <p className="text-lg">{selectedYear.description}</p>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-xs font-mono font-bold text-neutral-400 bg-neutral-100 px-2.5 py-1 rounded-md">
+                    {selectedYear.year}
+                  </span>
+                  <h4 className="text-xl font-heading font-bold text-neutral-900 tracking-tight">
+                    {selectedYear.title}
+                  </h4>
+                </div>
+                <p className="text-neutral-500 leading-relaxed">{selectedYear.description}</p>
               </div>
-              <div className="border-t pt-6">
-                <h4 className="text-xl font-bold mb-4 flex items-center">
-                  <span className="mr-2 text-2xl">{selectedYear.service.icon}</span>
-                  {selectedYear.service.title}
-                </h4>
-                <p className="text-lg">{selectedYear.service.description}</p>
+              <div className="border-t border-neutral-100 pt-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="w-10 h-10 rounded-xl bg-neutral-900 text-white flex items-center justify-center text-lg">
+                    {selectedYear.service.icon}
+                  </span>
+                  <h5 className="text-lg font-heading font-bold text-neutral-900 tracking-tight">
+                    {selectedYear.service.title}
+                  </h5>
+                </div>
+                <p className="text-neutral-500 leading-relaxed">{selectedYear.service.description}</p>
               </div>
-            </motion.article>
+            </motion.div>
           </AnimatePresence>
-        </section>
+        </div>
 
-        <section className="mt-16 text-center" aria-labelledby="values-title">
-          <h2 id="values-title" className="text-3xl font-bold mb-8">Our Values</h2>
+        {/* Values Section */}
+        <div className="text-center">
+          <span className="section-badge">What We Stand For</span>
+          <h3 className="text-2xl md:text-3xl font-bold font-heading tracking-tight text-neutral-900 mb-12">
+            Our Values
+          </h3>
           <div className="flex flex-wrap -mx-4">
             {values.map((value, index) => (
               <Card key={index} {...value} />
             ))}
           </div>
-        </section>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
