@@ -161,18 +161,18 @@ const NavbarAndHero = () => {
                       exit="exit"
                       transition={{ duration: 0.25, delay: index * 0.05 }}
                     >
-                      <Link
+                      <a
                         href={`#${item}`}
                         className={`block py-2 px-4 text-[0.9rem] font-heading font-medium tracking-tight rounded-lg transition-all duration-200 ${
                           activeLink === item
                             ? 'text-neutral-900 bg-neutral-100'
-                            : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
+                            : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50'
                         }`}
                         onClick={() => handleLinkClick(item)}
                         aria-current={activeLink === item ? 'page' : undefined}
                       >
                         {item}
-                      </Link>
+                      </a>
                     </motion.li>
                   ))}
                 </ul>

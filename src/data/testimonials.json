@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "author": "Rajesh Kumar",
+    "company": "TechCorp India",
+    "role": "CTO",
+    "content": "NeoCodeHub delivered exceptional results. Their attention to detail and technical expertise exceeded our expectations. The project was completed on time and within budget.",
+    "rating": 5
+  },
+  {
+    "id": "2",
+    "author": "Priya Sharma",
+    "company": "StartupXYZ",
+    "role": "Founder",
+    "content": "Working with NeoCodeHub was a game-changer for our business. They understood our vision perfectly and translated it into a beautiful, functional product.",
+    "rating": 5
+  },
+  {
+    "id": "3",
+    "author": "Alex Patel",
+    "company": "DigiSolutions",
+    "role": "Product Manager",
+    "content": "Professional, punctual, and incredibly skilled. Highly recommend NeoCodeHub for any web or mobile development project. They go above and beyond.",
+    "rating": 4
+  },
+  {
+    "id": "4",
+    "author": "Neha Gupta",
+    "company": "FinTech Solutions",
+    "role": "CEO",
+    "content": "The team at NeoCodeHub built us a robust fintech platform that handles thousands of transactions daily. Their expertise in security and scalability is unmatched.",
+    "rating": 5
+  }
+]

@@ -8,13 +8,23 @@ import HeroSection from "./_components/HeroSection";
 import StatsSection from "./_components/StatsSection";
 import ProcessSection from "./_components/ProcessSection";
 import TestimonialsSection from "./_components/TestimonialsSection";
+import ScrollProgress from "./_components/ScrollProgress";
+import CursorGlow from "./_components/CursorGlow";
+import MarqueeBanner from "./_components/MarqueeBanner";
+import PageIntro from "./_components/PageIntro";
+import ParallaxOrbs from "./_components/ParallaxOrbs";
 
 export default function Home() {
   return (
     <main className="relative">
+      <PageIntro />
+      <ParallaxOrbs />
+      <ScrollProgress />
+      <CursorGlow />
       <NavbarAndHero />
       <HeroSection />
       <StatsSection />
+      <MarqueeBanner />
       <Service />
       <div className="section-divider" />
       <TechStack />

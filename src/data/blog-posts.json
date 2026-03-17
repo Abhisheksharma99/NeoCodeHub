@@ -1,0 +1,35 @@
+[
+  {
+    "id": "1",
+    "title": "Building Scalable Web Applications with Next.js",
+    "excerpt": "Learn how to build high-performance web apps using Next.js and React with server components and edge functions.",
+    "content": "",
+    "category": "Development",
+    "status": "published",
+    "date": "2026-03-10",
+    "author": "NeoCodeHub Team",
+    "image": ""
+  },
+  {
+    "id": "2",
+    "title": "The Future of AI in Software Development",
+    "excerpt": "Exploring how artificial intelligence is transforming the way we build software and automate workflows.",
+    "content": "",
+    "category": "AI & ML",
+    "status": "published",
+    "date": "2026-03-08",
+    "author": "NeoCodeHub Team",
+    "image": ""
+  },
+  {
+    "id": "3",
+    "title": "Microservices Architecture: Best Practices",
+    "excerpt": "A comprehensive guide to designing and implementing microservices architecture for enterprise applications.",
+    "content": "",
+    "category": "Architecture",
+    "status": "draft",
+    "date": "2026-03-05",
+    "author": "NeoCodeHub Team",
+    "image": ""
+  }
+]

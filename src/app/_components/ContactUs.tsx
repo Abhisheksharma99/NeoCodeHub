@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import emailjs from '@emailjs/browser'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import MagneticButton from './MagneticButton';
 
 const icons = [
   { name: 'React', src: <FaReact /> },
@@ -24,6 +25,8 @@ interface FormErrors {
   phone: string,
   message: string
 }
+
+const easeOut = [0.16, 1, 0.3, 1] as const;
 
 export default function ContactUs() {
   const [formData, setFormData] = useState({
@@ -98,18 +101,45 @@ export default function ContactUs() {
       {/* Background accent */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-neutral-100 rounded-full blur-[120px] opacity-50 pointer-events-none" />
 
+      {/* Subtle parallax background orb */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-neutral-200/[0.06] rounded-full blur-3xl pointer-events-none"
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.04, 0.08, 0.04],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28 relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1.5 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-neutral-500 mb-6 border border-neutral-200/80">
+        <motion.div
+          className="text-center mb-16"
+          style={{ perspective: 800 }}
+          initial={{ opacity: 0, y: 40, rotateX: 8 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.8, ease: easeOut }}
+        >
+          <span className="inline-block px-4 py-1.5 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-neutral-700 mb-6 border border-neutral-200/80">
             Get In Touch
           </span>
           <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
             Contact Us
           </h2>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col lg:flex-row items-start gap-8 max-w-5xl mx-auto">
+        <motion.div
+          className="flex flex-col lg:flex-row items-start gap-8 max-w-5xl mx-auto"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.5 }}
+        >
           {/* Left: Tech Icons */}
           <div className="w-full lg:w-48 shrink-0">
             <div className="flex lg:flex-col items-center justify-center gap-3">
@@ -121,7 +151,7 @@ export default function ContactUs() {
                     ? { opacity: 1, scale: 1.1 }
                     : { opacity: 0.4, scale: 0.85 }
                   }
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.4, ease: easeOut }}
                 >
                   <div className={`w-14 h-14 flex items-center justify-center text-3xl rounded-2xl transition-all duration-300 ${
                     activeIcon === index
@@ -137,12 +167,19 @@ export default function ContactUs() {
 
           {/* Center + Right: Info & Form */}
           <div className="flex-1 flex flex-col md:flex-row gap-8">
-            {/* Info */}
-            <div className="w-full md:w-1/2">
+            {/* Info - slide in from left with parallax */}
+            <motion.div
+              className="w-full md:w-1/2"
+              style={{ perspective: 800 }}
+              initial={{ opacity: 0, x: -40, rotateY: 5 }}
+              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.8, delay: 0.15, ease: easeOut }}
+            >
               <h3 className="text-2xl font-heading font-bold tracking-tight text-neutral-900 mb-3">
                 Want to discuss your idea?
               </h3>
-              <p className="text-neutral-500 mb-6 leading-relaxed">
+              <p className="text-neutral-700 mb-6 leading-relaxed">
                 Hi, We are excited to hear about your project.
               </p>
               <Image
@@ -152,13 +189,20 @@ export default function ContactUs() {
                 height={140}
                 className="mb-6 drop-shadow-sm"
               />
-              <p className="text-neutral-400 text-sm">
+              <p className="text-neutral-600 text-sm">
                 Drop us a line and we will connect you to our experts.
               </p>
-            </div>
+            </motion.div>
 
-            {/* Form */}
-            <div className="w-full md:w-1/2">
+            {/* Form - slide in from right */}
+            <motion.div
+              className="w-full md:w-1/2"
+              style={{ perspective: 800 }}
+              initial={{ opacity: 0, x: 40, rotateY: -5 }}
+              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.8, delay: 0.25, ease: easeOut }}
+            >
               <div className="glass-card p-6 md:p-8">
                 <h3 className="text-lg font-heading font-bold tracking-tight text-neutral-900 mb-6">
                   We are here to help you.
@@ -229,12 +273,14 @@ export default function ContactUs() {
                         ></textarea>
                         {errors.message && <p className="text-red-400 text-xs mt-1.5">{errors.message}</p>}
                       </div>
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        text={isSubmitting ? 'Sending...' : 'Discuss Project'}
-                        btnClass="text-sm"
-                      />
+                      <MagneticButton strength={0.15}>
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting}
+                          text={isSubmitting ? 'Sending...' : 'Discuss Project'}
+                          btnClass="text-sm"
+                        />
+                      </MagneticButton>
                     </motion.form>
                   ) : (
                     <motion.div
@@ -249,14 +295,14 @@ export default function ContactUs() {
                         </svg>
                       </div>
                       <p className="text-neutral-900 font-heading font-bold text-lg mb-1">Thank you!</p>
-                      <p className="text-neutral-400 text-sm">We will get back to you soon.</p>
+                      <p className="text-neutral-600 text-sm">We will get back to you soon.</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

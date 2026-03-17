@@ -5,8 +5,9 @@ import Image from "next/image";
 import HeroImage from "../assets/HeroImage.svg";
 import { motion } from "framer-motion";
 import ContactButton from "./ContactButton";
+import MagneticButton from "./MagneticButton";
 
-const easeOut = [0.16, 1, 0.3, 1];
+const easeOut = [0.16, 1, 0.3, 1] as const;
 
 const HeroSection = () => {
   return (
@@ -37,18 +38,52 @@ const HeroSection = () => {
             <span className="text-neutral-600">Available for New Projects</span>
           </motion.div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold text-neutral-900 leading-[1.05] font-heading tracking-tight">
-            Transforming Ideas
+          <h1
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold text-neutral-900 leading-[1.05] font-heading tracking-tight"
+            style={{ perspective: 600 }}
+          >
+            {['Transforming', 'Ideas'].map((word, i) => (
+              <motion.span
+                key={i}
+                className="inline-block mr-[0.3em]"
+                style={{ transformStyle: 'preserve-3d' }}
+                initial={{ opacity: 0, y: 40, rotateX: -40 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ duration: 0.7, delay: 0.15 + i * 0.1, ease: easeOut }}
+              >
+                {word}
+              </motion.span>
+            ))}
             <br />
-            into{" "}
-            <span className="text-shimmer">Digital Reality</span>
+            {['into'].map((word, i) => (
+              <motion.span
+                key={i}
+                className="inline-block mr-[0.3em]"
+                style={{ transformStyle: 'preserve-3d' }}
+                initial={{ opacity: 0, y: 40, rotateX: -40 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ duration: 0.7, delay: 0.35 + i * 0.1, ease: easeOut }}
+              >
+                {word}
+              </motion.span>
+            ))}
+            <motion.span
+              className="text-shimmer inline-block"
+              style={{ transformStyle: 'preserve-3d' }}
+              initial={{ opacity: 0, y: 40, rotateX: -40 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0 }}
+              transition={{ duration: 0.8, delay: 0.45, ease: easeOut }}
+            >
+              Digital Reality
+            </motion.span>
           </h1>
 
+          {/* Subtitle with blur reveal */}
           <motion.p
-            className="text-lg md:text-xl text-neutral-500 mt-6 mb-10 max-w-lg leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: easeOut }}
+            className="text-lg md:text-xl text-neutral-700 mt-6 mb-10 max-w-lg leading-relaxed"
+            initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 0.8, delay: 0.3, ease: easeOut }}
           >
             Elevating businesses with cutting-edge solutions in web, mobile, and
             AI development.
@@ -60,13 +95,17 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.35, ease: easeOut }}
           >
-            <Button text="See Our Work →" btnClass="px-8 py-4 text-base" />
-            <ContactButton
-              headerText="How can we help you with your project?"
-              showProjectType={true}
-              btnText="Get Free Quote"
-              getQuote={true}
-            />
+            <MagneticButton strength={0.2}>
+              <Button text="See Our Work →" btnClass="px-8 py-4 text-base" />
+            </MagneticButton>
+            <MagneticButton strength={0.2}>
+              <ContactButton
+                headerText="How can we help you with your project?"
+                showProjectType={true}
+                btnText="Get Free Quote"
+                getQuote={true}
+              />
+            </MagneticButton>
           </motion.div>
 
           {/* Trust indicators */}
@@ -90,7 +129,7 @@ const HeroSection = () => {
               <div className="flex items-center gap-1 text-amber-400 text-xs mb-0.5">
                 {'★★★★★'}
               </div>
-              <p className="text-neutral-400 text-xs">
+              <p className="text-neutral-600 text-xs">
                 Trusted by <span className="text-neutral-700 font-semibold">30+</span> clients worldwide
               </p>
             </div>

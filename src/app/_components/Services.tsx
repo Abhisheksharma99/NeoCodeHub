@@ -1,3 +1,6 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import MobileImage from "../assets/Mobile App.png";
 import AiImage from "../assets/AI.png";
 import WebImage from "../assets/Web Design.png";
@@ -48,38 +51,87 @@ const chooseUs: ServiceData[] = [
   },
 ];
 
+const easeOut = [0.16, 1, 0.3, 1] as const;
+
 export default function Services() {
   return (
     <section id="Services" className="relative">
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          style={{ perspective: 800 }}
+          initial={{ opacity: 0, y: 40, rotateX: 8 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.8, ease: easeOut }}
+        >
           <span className="section-badge">What We Do</span>
           <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
             Our Services
           </h2>
-          <p className="text-neutral-400 text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-neutral-700 text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
             At NeoCodeHub, we offer a wide range of cutting-edge services to
             meet your digital needs. Our expert team is dedicated to delivering
             high-quality solutions tailored to your business.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-wrap -mx-4">
+        <div className="flex flex-wrap -mx-4" style={{ perspective: 800 }}>
           {services.map((service, index) => (
-            <Card key={index} {...service} />
+            <motion.div
+              key={index}
+              className="w-full md:w-1/2 lg:w-1/3 flex"
+              style={{ transformStyle: 'preserve-3d' }}
+              initial={{ opacity: 0, y: 50, rotateX: 6 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{
+                duration: 0.8,
+                delay: index * 0.12,
+                ease: easeOut,
+              }}
+            >
+              <div className="p-4 flex w-full" style={{ transform: 'translateZ(20px)' }}>
+                <Card {...service} noOuterWrapper />
+              </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Why Choose Us */}
         <div className="mt-28 text-center">
-          <span className="section-badge">Our Strengths</span>
-          <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight text-neutral-900 mb-12">
-            Why Choose Us?
-          </h2>
-          <div className="flex flex-wrap -mx-4">
+          <motion.div
+            style={{ perspective: 800 }}
+            initial={{ opacity: 0, y: 40, rotateX: 8 }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.8, ease: easeOut }}
+          >
+            <span className="section-badge">Our Strengths</span>
+            <h2 className="text-3xl md:text-4xl font-bold font-heading tracking-tight text-neutral-900 mb-12">
+              Why Choose Us?
+            </h2>
+          </motion.div>
+          <div className="flex flex-wrap -mx-4" style={{ perspective: 800 }}>
             {chooseUs.map((service, index) => (
-              <Card key={index} {...service} />
+              <motion.div
+                key={index}
+                className="w-full md:w-1/2 lg:w-1/3 flex"
+                style={{ transformStyle: 'preserve-3d' }}
+                initial={{ opacity: 0, y: 50, rotateX: 6 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{
+                  duration: 0.8,
+                  delay: index * 0.12,
+                  ease: easeOut,
+                }}
+              >
+                <div className="p-4 flex w-full" style={{ transform: 'translateZ(20px)' }}>
+                  <Card {...service} noOuterWrapper />
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "1",
+    "title": "E-Commerce Platform",
+    "description": "Full-stack marketplace with payment integration, inventory management, and real-time analytics dashboard",
+    "category": "Web Development",
+    "status": "completed",
+    "image": "",
+    "tags": [
+      "Next.js",
+      "Node.js",
+      "MongoDB",
+      "Stripe"
+    ]
+  },
+  {
+    "id": "2",
+    "title": "AI Chatbot System",
+    "description": "NLP-powered customer support chatbot with multi-language support and sentiment analysis",
+    "category": "AI & ML",
+    "status": "completed",
+    "image": "",
+    "tags": [
+      "Python",
+      "TensorFlow",
+      "React",
+      "FastAPI"
+    ]
+  },
+  {
+    "id": "3",
+    "title": "Healthcare Dashboard",
+    "description": "Real-time patient monitoring dashboard with HIPAA-compliant data handling and alerts",
+    "category": "Web Development",
+    "status": "in-progress",
+    "image": "",
+    "tags": [
+      "React",
+      "TypeScript",
+      "AWS",
+      "PostgreSQL"
+    ]
+  },
+  {
+    "id": "4",
+    "title": "Mobile Banking App",
+    "description": "Cross-platform mobile banking application with biometric authentication and real-time transactions",
+    "category": "Mobile Development",
+    "status": "completed",
+    "image": "",
+    "tags": [
+      "React Native",
+      "Node.js",
+      "Firebase",
+      "Plaid"
+    ]
+  }
+]
