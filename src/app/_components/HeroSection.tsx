@@ -2,6 +2,7 @@
 
 import { Button } from "./Button";
 import Image from "next/image";
+import Link from "next/link";
 import HeroImage from "../assets/HeroImage.svg";
 import { motion } from "framer-motion";
 import ContactButton from "./ContactButton";
@@ -96,7 +97,9 @@ const HeroSection = () => {
             transition={{ duration: 0.7, delay: 0.35, ease: easeOut }}
           >
             <MagneticButton strength={0.2}>
-              <Button text="See Our Work →" btnClass="px-8 py-4 text-base" />
+              <Link href="/projects">
+                <Button text="See Our Work →" btnClass="px-8 py-4 text-base" />
+              </Link>
             </MagneticButton>
             <MagneticButton strength={0.2}>
               <ContactButton

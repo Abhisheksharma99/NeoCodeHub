@@ -164,10 +164,10 @@ const Footer = () => {
               Useful Links
             </h4>
             <div className="space-y-3">
-              <a href="/aboutus" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
+              <a href="/#About" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
                 <FaAddressCard className="text-xs" /> About Us
               </a>
-              <a href="/contactus" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
+              <a href="/#Contact" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
                 <FaAddressBook className="text-xs" /> Contact Us
               </a>
               <a href="tel:+917019797893" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
