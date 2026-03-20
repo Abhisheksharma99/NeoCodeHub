@@ -60,7 +60,15 @@ const NavbarAndHero = () => {
     [isMobile]
   );
 
-  const menuItems = useMemo(() => ['Home', 'Services', 'Tech', 'About', 'Contact'], []);
+  const menuItems = useMemo(() => [
+    { label: 'Home', href: '#Home' },
+    { label: 'Services', href: '#Services' },
+    { label: 'Tech', href: '#Tech' },
+    { label: 'Portfolio', href: '/portfolio' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'About', href: '#About' },
+    { label: 'Contact', href: '#Contact' },
+  ], []);
 
   const menuVariants = {
     closed: { opacity: 0, y: '-100%' },
@@ -154,7 +162,7 @@ const NavbarAndHero = () => {
                 >
                   {menuItems.map((item, index) => (
                     <motion.li
-                      key={item}
+                      key={item.label}
                       variants={linkVariants}
                       initial="initial"
                       animate="animate"
@@ -162,16 +170,16 @@ const NavbarAndHero = () => {
                       transition={{ duration: 0.25, delay: index * 0.05 }}
                     >
                       <Link
-                        href={`#${item}`}
+                        href={item.href}
                         className={`block py-2 px-4 text-[0.9rem] font-heading font-medium tracking-tight rounded-lg transition-all duration-200 ${
-                          activeLink === item
+                          activeLink === item.label
                             ? 'text-neutral-900 bg-neutral-100'
                             : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
                         }`}
-                        onClick={() => handleLinkClick(item)}
-                        aria-current={activeLink === item ? 'page' : undefined}
+                        onClick={() => handleLinkClick(item.label)}
+                        aria-current={activeLink === item.label ? 'page' : undefined}
                       >
-                        {item}
+                        {item.label}
                       </Link>
                     </motion.li>
                   ))}

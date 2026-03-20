@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from "./Button";
 import Image from "next/image";
+import Link from "next/link";
 import HeroImage from "../assets/HeroImage.svg";
 import { motion } from "framer-motion";
 import ContactButton from "./ContactButton";
@@ -60,7 +60,12 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.35, ease: easeOut }}
           >
-            <Button text="See Our Work →" btnClass="px-8 py-4 text-base" />
+            <Link
+              href="/portfolio"
+              className="shining-button px-8 py-4 text-base bg-neutral-900 hover:bg-neutral-800 text-white font-heading font-semibold tracking-tight transition-all duration-300 ease-out hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 rounded-full flex items-center gap-2 text-sm"
+            >
+              <span className="whitespace-nowrap">See Our Work →</span>
+            </Link>
             <ContactButton
               headerText="How can we help you with your project?"
               showProjectType={true}
