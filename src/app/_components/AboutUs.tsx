@@ -94,6 +94,8 @@ const values: ServiceData[] = [
   },
 ];
 
+const easeOut = [0.16, 1, 0.3, 1] as const;
+
 export default function AboutUs() {
   const [selectedYear, setSelectedYear] = useState(timeline[timeline.length - 1]);
 
@@ -104,18 +106,26 @@ export default function AboutUs() {
   const yearButtons = useMemo(
     () =>
       timeline.map((item, index) => (
-        <button
+        <motion.button
           key={item.year}
           aria-pressed={selectedYear.year === item.year}
           className={`relative px-4 md:px-6 py-2.5 rounded-full text-sm font-heading font-semibold tracking-tight transition-all duration-300 ${
             selectedYear.year === item.year
               ? 'bg-neutral-900 text-white shadow-lg shadow-neutral-900/20 shining-button'
-              : 'bg-white/70 backdrop-blur-sm border border-neutral-200 text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 hover:bg-white/90'
+              : 'bg-white/70 backdrop-blur-sm border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:border-neutral-300 hover:bg-white/90'
           }`}
           onClick={() => handleYearSelect(index)}
+          animate={
+            selectedYear.year === item.year
+              ? { scale: 1.08 }
+              : { scale: 1 }
+          }
+          transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           {item.year}
-        </button>
+        </motion.button>
       )),
     [selectedYear, handleYearSelect]
   );
@@ -124,26 +134,47 @@ export default function AboutUs() {
     <section id="About" className="relative">
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          style={{ perspective: 800 }}
+          initial={{ opacity: 0, y: 40, rotateX: 8 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.8, ease: easeOut }}
+        >
           <span className="section-badge">Our Story</span>
           <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
             About Us
           </h2>
-        </div>
+        </motion.div>
 
-        <div className="max-w-3xl mx-auto mb-20">
-          <p className="text-lg text-center text-neutral-500 leading-relaxed mb-4">
+        <motion.div
+          className="max-w-3xl mx-auto mb-20"
+          style={{ perspective: 800 }}
+          initial={{ opacity: 0, y: 40, rotateX: 8 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.8, delay: 0.1, ease: easeOut }}
+        >
+          <p className="text-lg text-center text-neutral-700 leading-relaxed mb-4">
             At <strong className="text-neutral-900 font-semibold">NeoCodeHub</strong>, we transform ideas into digital solutions. Our experts create
             cutting-edge technology for businesses.
           </p>
-          <p className="text-lg text-center text-neutral-500 leading-relaxed">
+          <p className="text-lg text-center text-neutral-700 leading-relaxed">
             Since our founding in 2020, we have stayed at the forefront of web, AI, and mobile development,
             empowering businesses to grow with technology.
           </p>
-        </div>
+        </motion.div>
 
         {/* Journey Timeline */}
-        <div className="mb-24">
+        <motion.div
+          className="mb-24"
+          style={{ perspective: 800 }}
+          initial={{ opacity: 0, y: 40, rotateX: 8 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.8, ease: easeOut }}
+        >
           <h3 className="text-2xl md:text-3xl font-bold font-heading tracking-tight text-center mb-10 text-neutral-900">
             Our Journey & Services
           </h3>
@@ -157,22 +188,23 @@ export default function AboutUs() {
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedYear.year}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, x: -30, rotateY: 5 }}
+              animate={{ opacity: 1, x: 0, rotateY: 0 }}
+              exit={{ opacity: 0, x: 30, rotateY: -5 }}
+              transition={{ duration: 0.45, ease: easeOut }}
               className="glass-card p-8 md:p-10 max-w-3xl mx-auto"
+              style={{ transformStyle: 'preserve-3d', perspective: 800 }}
             >
               <div className="mb-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="text-xs font-mono font-bold text-neutral-400 bg-neutral-100 px-2.5 py-1 rounded-md">
+                  <span className="text-xs font-mono font-bold text-neutral-600 bg-neutral-100 px-2.5 py-1 rounded-md">
                     {selectedYear.year}
                   </span>
                   <h4 className="text-xl font-heading font-bold text-neutral-900 tracking-tight">
                     {selectedYear.title}
                   </h4>
                 </div>
-                <p className="text-neutral-500 leading-relaxed">{selectedYear.description}</p>
+                <p className="text-neutral-700 leading-relaxed">{selectedYear.description}</p>
               </div>
               <div className="border-t border-neutral-100 pt-6">
                 <div className="flex items-center gap-3 mb-3">
@@ -183,21 +215,45 @@ export default function AboutUs() {
                     {selectedYear.service.title}
                   </h5>
                 </div>
-                <p className="text-neutral-500 leading-relaxed">{selectedYear.service.description}</p>
+                <p className="text-neutral-700 leading-relaxed">{selectedYear.service.description}</p>
               </div>
             </motion.div>
           </AnimatePresence>
-        </div>
+        </motion.div>
 
         {/* Values Section */}
         <div className="text-center">
-          <span className="section-badge">What We Stand For</span>
-          <h3 className="text-2xl md:text-3xl font-bold font-heading tracking-tight text-neutral-900 mb-12">
-            Our Values
-          </h3>
-          <div className="flex flex-wrap -mx-4">
+          <motion.div
+            style={{ perspective: 800 }}
+            initial={{ opacity: 0, y: 40, rotateX: 8 }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.8, ease: easeOut }}
+          >
+            <span className="section-badge">What We Stand For</span>
+            <h3 className="text-2xl md:text-3xl font-bold font-heading tracking-tight text-neutral-900 mb-12">
+              Our Values
+            </h3>
+          </motion.div>
+          <div className="flex flex-wrap -mx-4" style={{ perspective: 800 }}>
             {values.map((value, index) => (
-              <Card key={index} {...value} />
+              <motion.div
+                key={index}
+                className="w-full md:w-1/2 lg:w-1/3 flex"
+                style={{ transformStyle: 'preserve-3d' }}
+                initial={{ opacity: 0, y: 50, rotateX: 6 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{
+                  duration: 0.8,
+                  delay: index * 0.12,
+                  ease: easeOut,
+                }}
+              >
+                <div className="p-4 flex w-full" style={{ transform: 'translateZ(20px)' }}>
+                  <Card {...value} noOuterWrapper />
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>
