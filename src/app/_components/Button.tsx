@@ -5,12 +5,17 @@ export const Button = (props: {
   text: string;
   btnClass?: string;
   disabled?: boolean;
+  ariaLabel?: string;
+  onClick?: () => void;
 }) => {
   return (
     <div>
       <button
         type={props.type}
         disabled={props.disabled}
+        onClick={props.onClick}
+        aria-label={props.ariaLabel}
+        aria-busy={props.disabled && props.type === 'submit' ? true : undefined}
         className={`${
           props.disabled
             ? "bg-neutral-300 cursor-not-allowed text-neutral-500"
