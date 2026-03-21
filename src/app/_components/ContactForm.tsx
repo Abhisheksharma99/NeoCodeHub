@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Discuss from '../assets/Discuss.svg';
 import Invoice from "../assets/Invoice-bro.svg"
 import PhoneInput from 'react-phone-input-2';
+import emailjs from '@emailjs/browser'
 
 interface ContactFormPopupProps {
   headerText: string,
@@ -121,13 +122,22 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, getQuot
     setFormData(prevState => ({ ...prevState, phone: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
-    setSubmitted(true)
-    setTimeout(() => {
-      onClose()
-    }, 2200)
+    try {
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '',
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '',
+        formData,
+        process.env.NEXT_PUBLIC_EMAILJS_USER_ID || ''
+      )
+      setSubmitted(true)
+      setTimeout(() => {
+        onClose()
+      }, 2200)
+    } catch {
+      // Silently handle error - could add toast notification here
+    }
   }
 
   const filledCount = [formData.name, formData.email, formData.message].filter(Boolean).length

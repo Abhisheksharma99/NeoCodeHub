@@ -1,22 +1,26 @@
+import dynamic from 'next/dynamic';
 import NavbarAndHero from "./_components/Navbar";
-import AboutUs from "./_components/AboutUs";
-import ContactUs from "./_components/ContactUs";
-import Footer from "./_components/Footer";
-import Service from "./_components/Services";
-import TechStack from "./_components/TechStack";
 import HeroSection from "./_components/HeroSection";
 import StatsSection from "./_components/StatsSection";
-import ProcessSection from "./_components/ProcessSection";
-import TestimonialsSection from "./_components/TestimonialsSection";
-import ScrollProgress from "./_components/ScrollProgress";
-import CursorGlow from "./_components/CursorGlow";
-import MarqueeBanner from "./_components/MarqueeBanner";
-import PageIntro from "./_components/PageIntro";
-import ParallaxOrbs from "./_components/ParallaxOrbs";
+
+// Lazy load below-fold and enhancement components
+const Service = dynamic(() => import("./_components/Services"));
+const TechStack = dynamic(() => import("./_components/TechStack"));
+const ProcessSection = dynamic(() => import("./_components/ProcessSection"));
+const AboutUs = dynamic(() => import("./_components/AboutUs"));
+const TestimonialsSection = dynamic(() => import("./_components/TestimonialsSection"));
+const ContactUs = dynamic(() => import("./_components/ContactUs"));
+const Footer = dynamic(() => import("./_components/Footer"));
+const ThemeToggle = dynamic(() => import("./_components/ThemeToggle"));
+const ScrollProgress = dynamic(() => import("./_components/ScrollProgress"));
+const CursorGlow = dynamic(() => import("./_components/CursorGlow"));
+const MarqueeBanner = dynamic(() => import("./_components/MarqueeBanner"));
+const PageIntro = dynamic(() => import("./_components/PageIntro"));
+const ParallaxOrbs = dynamic(() => import("./_components/ParallaxOrbs"));
 
 export default function Home() {
   return (
-    <main className="relative">
+    <main id="main-content" className="relative">
       <PageIntro />
       <ParallaxOrbs />
       <ScrollProgress />
@@ -37,6 +41,7 @@ export default function Home() {
       <div className="section-divider" />
       <ContactUs />
       <Footer />
+      <ThemeToggle />
     </main>
   );
 }

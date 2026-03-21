@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { FaAngular, FaDatabase, FaNode, FaPython, FaReact } from 'react-icons/fa';
 import { Button } from './Button';
 import contactUs from '../assets/contactUs.svg'
@@ -26,6 +26,9 @@ interface FormErrors {
   message: string
 }
 
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+const RATE_LIMIT_MS = 60000 // 1 minute between submissions
+
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
 export default function ContactUs() {
@@ -40,7 +43,9 @@ export default function ContactUs() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [activeIcon, setActiveIcon] = useState(0)
+  const lastSubmitTime = useRef(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,23 +54,53 @@ export default function ContactUs() {
     return () => clearInterval(interval)
   }, [])
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const formErrors: FormErrors = { name: '', email: '', phone: '', message: '' }
-    if (!formData.name.trim()) formErrors.name = "Name is required"
-    if (!formData.email.trim()) formErrors.email = "Email is required"
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) formErrors.email = "Email is invalid"
-    if (!formData.phone.trim()) formErrors.phone = "Phone number is required"
-    if (!formData.message.trim()) formErrors.message = "Message is required"
+    let hasError = false
+
+    if (!formData.name.trim()) {
+      formErrors.name = "Name is required"
+      hasError = true
+    } else if (formData.name.trim().length > 100) {
+      formErrors.name = "Name is too long"
+      hasError = true
+    }
+
+    if (!formData.email.trim()) {
+      formErrors.email = "Email is required"
+      hasError = true
+    } else if (!EMAIL_REGEX.test(formData.email)) {
+      formErrors.email = "Please enter a valid email address"
+      hasError = true
+    }
+
+    if (!formData.phone.trim()) {
+      formErrors.phone = "Phone number is required"
+      hasError = true
+    } else if (formData.phone.replace(/\D/g, '').length < 7) {
+      formErrors.phone = "Please enter a valid phone number"
+      hasError = true
+    }
+
+    if (!formData.message.trim()) {
+      formErrors.message = "Message is required"
+      hasError = true
+    } else if (formData.message.trim().length > 2000) {
+      formErrors.message = "Message is too long (max 2000 characters)"
+      hasError = true
+    }
+
     setErrors(formErrors)
-    return Object.keys(formErrors).length === 0
-  }
+    return !hasError
+  }, [formData])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prevState => ({ ...prevState, [name]: value }))
-    if (errors.name) {
+    if (errors[name as keyof FormErrors]) {
       setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
     }
+    setSubmitError('')
   }
 
   const handlePhoneChange = (value: string) => {
@@ -77,27 +112,36 @@ export default function ContactUs() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitError('')
+
+    // Rate limiting
+    const now = Date.now()
+    if (now - lastSubmitTime.current < RATE_LIMIT_MS) {
+      setSubmitError('Please wait a moment before submitting again.')
+      return
+    }
+
     if (validateForm()) {
       setIsSubmitting(true)
       try {
         await emailjs.send(
-          'YOUR_SERVICE_ID',
-          'YOUR_TEMPLATE_ID',
+          process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '',
+          process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '',
           formData,
-          'YOUR_USER_ID'
+          process.env.NEXT_PUBLIC_EMAILJS_USER_ID || ''
         )
+        lastSubmitTime.current = Date.now()
         setIsSubmitted(true)
         setFormData({ name: '', email: '', phone: '', message: '' })
-      } catch (error) {
-        console.error('Error sending email:', error)
-        alert('Failed to send message. Please try again.')
+      } catch {
+        setSubmitError('Failed to send message. Please try again later.')
       }
       setIsSubmitting(false)
     }
   }
 
   return (
-    <section id="Contact" className="relative">
+    <section id="Contact" className="relative" aria-labelledby="contact-heading">
       {/* Background accent */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-neutral-100 rounded-full blur-[120px] opacity-50 pointer-events-none" />
 
@@ -128,7 +172,7 @@ export default function ContactUs() {
           <span className="inline-block px-4 py-1.5 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-neutral-700 mb-6 border border-neutral-200/80">
             Get In Touch
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
+          <h2 id="contact-heading" className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
             Contact Us
           </h2>
         </motion.div>
@@ -141,7 +185,7 @@ export default function ContactUs() {
           transition={{ duration: 0.5 }}
         >
           {/* Left: Tech Icons */}
-          <div className="w-full lg:w-48 shrink-0">
+          <div className="w-full lg:w-48 shrink-0" aria-hidden="true">
             <div className="flex lg:flex-col items-center justify-center gap-3">
               {icons.map((icon, index) => (
                 <motion.div
@@ -215,39 +259,60 @@ export default function ContactUs() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
+                      noValidate
                     >
                       <div>
+                        <label htmlFor="contact-name" className="sr-only">Your Name</label>
                         <input
                           type="text"
+                          id="contact-name"
                           name="name"
                           value={formData.name}
                           onChange={handleChange}
                           placeholder="Your Name*"
+                          maxLength={100}
                           className={`form-input-modern ${errors.name ? 'border-b-red-400' : ''}`}
-                          required
+                          aria-required="true"
+                          aria-invalid={!!errors.name}
+                          aria-describedby={errors.name ? 'contact-name-error' : undefined}
                         />
-                        {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
+                        {errors.name && (
+                          <p id="contact-name-error" className="text-red-400 text-xs mt-1.5" role="alert">
+                            {errors.name}
+                          </p>
+                        )}
                       </div>
                       <div>
+                        <label htmlFor="contact-email" className="sr-only">Email Address</label>
                         <input
                           type="email"
+                          id="contact-email"
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
                           placeholder="Email Address*"
                           className={`form-input-modern ${errors.email ? 'border-b-red-400' : ''}`}
-                          required
+                          aria-required="true"
+                          aria-invalid={!!errors.email}
+                          aria-describedby={errors.email ? 'contact-email-error' : undefined}
                         />
-                        {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
+                        {errors.email && (
+                          <p id="contact-email-error" className="text-red-400 text-xs mt-1.5" role="alert">
+                            {errors.email}
+                          </p>
+                        )}
                       </div>
                       <div>
+                        <label htmlFor="contact-phone" className="sr-only">Phone Number</label>
                         <PhoneInput
                           country={'in'}
                           value={formData.phone}
                           onChange={handlePhoneChange}
                           inputProps={{
+                            id: 'contact-phone',
                             name: 'phone',
-                            required: true,
+                            'aria-required': 'true',
+                            'aria-label': 'Phone number',
                             className: 'form-input-modern !pl-12',
                             placeholder: 'Enter Phone No.',
                           }}
@@ -260,25 +325,45 @@ export default function ContactUs() {
                             borderRadius: 0,
                           }}
                         />
+                        {errors.phone && (
+                          <p className="text-red-400 text-xs mt-1.5" role="alert">
+                            {errors.phone}
+                          </p>
+                        )}
                       </div>
                       <div>
+                        <label htmlFor="contact-message" className="sr-only">Message</label>
                         <textarea
+                          id="contact-message"
                           name="message"
                           value={formData.message}
                           onChange={handleChange}
                           placeholder="How can we help you?"
                           rows={2}
+                          maxLength={2000}
                           className={`form-input-modern resize-none ${errors.message ? 'border-b-red-400' : ''}`}
-                          required
+                          aria-required="true"
+                          aria-invalid={!!errors.message}
+                          aria-describedby={errors.message ? 'contact-message-error' : undefined}
                         ></textarea>
-                        {errors.message && <p className="text-red-400 text-xs mt-1.5">{errors.message}</p>}
+                        {errors.message && (
+                          <p id="contact-message-error" className="text-red-400 text-xs mt-1.5" role="alert">
+                            {errors.message}
+                          </p>
+                        )}
                       </div>
+
+                      {submitError && (
+                        <p className="text-red-400 text-xs" role="alert">{submitError}</p>
+                      )}
+
                       <MagneticButton strength={0.15}>
                         <Button
                           type="submit"
                           disabled={isSubmitting}
                           text={isSubmitting ? 'Sending...' : 'Discuss Project'}
                           btnClass="text-sm"
+                          ariaLabel={isSubmitting ? 'Sending your message' : 'Submit contact form'}
                         />
                       </MagneticButton>
                     </motion.form>
@@ -288,6 +373,7 @@ export default function ContactUs() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                       className="text-center py-8"
+                      role="status"
                     >
                       <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

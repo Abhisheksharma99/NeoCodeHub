@@ -4,6 +4,7 @@ import React from "react";
 import TSILogo from "../assets/TSILogo.png";
 import ContactButton from "./ContactButton";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import MagneticButton from "./MagneticButton";
 import {
@@ -22,6 +23,9 @@ import {
   FaArrowUp,
 } from "react-icons/fa";
 
+const whatsappPhone = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || '';
+const contactPhone = process.env.NEXT_PUBLIC_CONTACT_PHONE || '';
+
 const socialLinks = [
   { icon: FaLinkedin, label: "LinkedIn", href: "#", hoverColor: "hover:text-blue-400" },
   { icon: FaTwitter, label: "Twitter", href: "#", hoverColor: "hover:text-neutral-300" },
@@ -31,7 +35,7 @@ const socialLinks = [
   {
     icon: FaWhatsapp,
     label: "WhatsApp",
-    href: "//api.whatsapp.com/send?phone=917015445629&text=Hi!, I have a query regarding",
+    href: `//api.whatsapp.com/send?phone=${whatsappPhone}&text=Hi!, I have a query regarding`,
     hoverColor: "hover:text-green-400",
   },
 ];
@@ -47,7 +51,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="relative bg-neutral-950 text-white mt-0">
+    <footer className="relative bg-neutral-950 text-white mt-0" role="contentinfo">
       {/* Gradient transition from main content */}
       <div className="absolute -top-16 left-0 right-0 h-16 bg-gradient-to-b from-transparent to-neutral-950 pointer-events-none" />
 
@@ -122,7 +126,9 @@ const Footer = () => {
                 <MagneticButton strength={0.3}>
                   <a
                     href={href}
-                    aria-label={label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Follow us on ${label}`}
                     className={`w-10 h-10 flex items-center justify-center rounded-full bg-neutral-800/80 text-neutral-500 ${hoverColor} hover:bg-neutral-700/80 transition-all duration-200`}
                   >
                     <motion.span
@@ -142,7 +148,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
           {/* Company Info */}
           <div className="text-center md:text-left">
-            <a href="/">
+            <Link href="/">
               <Image
                 src={TSILogo}
                 width={200}
@@ -150,7 +156,7 @@ const Footer = () => {
                 alt="NeoCodeHub logo"
                 className="mx-auto md:mx-0 mb-4 brightness-0 invert opacity-90"
               />
-            </a>
+            </Link>
             <p className="text-neutral-500 text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
               NeoCodeHub is a leading software and website development company
               dedicated to transforming ideas into innovative digital solutions
@@ -163,17 +169,22 @@ const Footer = () => {
             <h4 className="font-heading font-bold text-xs tracking-[0.15em] uppercase text-neutral-300 mb-6">
               Useful Links
             </h4>
-            <div className="space-y-3">
-              <a href="/#About" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
-                <FaAddressCard className="text-xs" /> About Us
-              </a>
-              <a href="/#Contact" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
-                <FaAddressBook className="text-xs" /> Contact Us
-              </a>
-              <a href="tel:+917019797893" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
-                <FaQuestionCircle className="text-xs" /> Query?
-              </a>
-            </div>
+            <nav aria-label="Footer navigation">
+              <div className="space-y-3">
+                <Link href="#About" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
+                  <FaAddressCard className="text-xs" /> About Us
+                </Link>
+                <Link href="#Contact" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
+                  <FaAddressBook className="text-xs" /> Contact Us
+                </Link>
+                <Link href="/privacy-policy" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
+                  <FaQuestionCircle className="text-xs" /> Privacy Policy
+                </Link>
+                <Link href="/terms-of-service" className="flex items-center justify-center gap-2 text-neutral-500 hover:text-white transition-colors text-sm">
+                  <FaQuestionCircle className="text-xs" /> Terms of Service
+                </Link>
+              </div>
+            </nav>
           </div>
 
           {/* Contact & Address */}
@@ -200,13 +211,15 @@ const Footer = () => {
                 <FaEnvelope className="text-xs shrink-0" />
                 info@NeoCodeHub.com
               </a>
-              <a
-                href="tel:+917015445629"
-                className="flex items-center justify-center md:justify-end gap-2 text-neutral-500 hover:text-white transition-colors text-sm"
-              >
-                <FaPhone className="text-xs shrink-0" />
-                +91 7015445629
-              </a>
+              {contactPhone && (
+                <a
+                  href={`tel:${contactPhone}`}
+                  className="flex items-center justify-center md:justify-end gap-2 text-neutral-500 hover:text-white transition-colors text-sm"
+                >
+                  <FaPhone className="text-xs shrink-0" />
+                  {contactPhone}
+                </a>
+              )}
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   FaReact, FaNodeJs, FaAngular, FaPython, FaPhp, FaSwift,
   FaLaravel, FaMagento, FaShopify, FaJava
@@ -13,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
+import debounce from "lodash.debounce";
 
 const techs = [
   { icon: <FaReact />, name: "React", description: "A JavaScript library for building UIs." },
@@ -45,13 +46,27 @@ const easeOut = [0.16, 1, 0.3, 1] as const;
 
 const TechStack = () => {
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const filteredTechs = techs.filter(tech =>
-    tech.name.toLowerCase().includes(search.toLowerCase())
+  const debouncedSetSearch = useMemo(
+    () => debounce((value: string) => setDebouncedSearch(value), 300),
+    []
+  );
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    debouncedSetSearch(e.target.value);
+  }, [debouncedSetSearch]);
+
+  const filteredTechs = useMemo(
+    () => techs.filter(tech =>
+      tech.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+    ),
+    [debouncedSearch]
   );
 
   return (
-    <section id="Tech" className="relative">
+    <section id="Tech" className="relative" aria-labelledby="tech-heading">
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28">
         {/* Section Header */}
         <motion.div
@@ -63,7 +78,7 @@ const TechStack = () => {
           transition={{ duration: 0.8, ease: easeOut }}
         >
           <span className="section-badge">Technologies</span>
-          <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
+          <h2 id="tech-heading" className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
             Our Technology Stack
           </h2>
           <p className="text-neutral-700 text-lg mt-4 max-w-2xl mx-auto leading-relaxed mb-8">
@@ -74,7 +89,7 @@ const TechStack = () => {
           {/* Search Input */}
           <div className="max-w-md mx-auto relative">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <svg className="w-4 h-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <svg className="w-4 h-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -83,7 +98,8 @@ const TechStack = () => {
               placeholder="Search technology..."
               className="w-full pl-11 pr-4 py-3 bg-white/80 backdrop-blur-sm border border-neutral-200 rounded-full text-sm font-body text-neutral-700 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-300 transition-all shadow-sm"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={handleSearchChange}
+              aria-label="Search technologies"
             />
           </div>
         </motion.div>
@@ -105,7 +121,7 @@ const TechStack = () => {
                 className="flex flex-col items-center justify-center py-5 px-3 rounded-2xl bg-white/60 backdrop-blur-sm border border-neutral-100/80 hover:border-neutral-200 hover:bg-white/90 hover:shadow-md transition-all duration-300 cursor-default"
                 data-tooltip-id={`tooltip-${tech.name}`}
               >
-                <div className="text-3xl text-neutral-600 group-hover:text-neutral-900 transition-colors duration-200 mb-2">
+                <div className="text-3xl text-neutral-600 group-hover:text-neutral-900 transition-colors duration-200 mb-2" aria-hidden="true">
                   {tech.icon}
                 </div>
                 <p className="text-xs font-medium text-neutral-700 group-hover:text-neutral-900 transition-colors text-center leading-tight">
@@ -124,7 +140,7 @@ const TechStack = () => {
         </div>
 
         {filteredTechs.length === 0 && (
-          <p className="text-center text-neutral-600 mt-12 text-sm">
+          <p className="text-center text-neutral-600 mt-12 text-sm" role="status">
             No technologies found matching &ldquo;{search}&rdquo;
           </p>
         )}
