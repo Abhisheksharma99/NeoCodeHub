@@ -1,12 +1,8 @@
-'use client';
-
 import React from "react";
 import TSILogo from "../assets/TSILogo.png";
 import ContactButton from "./ContactButton";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import MagneticButton from "./MagneticButton";
 import {
   FaLinkedin,
   FaTwitter,
@@ -40,31 +36,17 @@ const socialLinks = [
   },
 ];
 
-const easeOut = [0.16, 1, 0.3, 1] as const;
-
 const Footer = () => {
   const currentDate = new Date();
-
-  const scrollToTop = (e: React.MouseEvent) => {
-    e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   return (
     <footer className="relative bg-neutral-950 text-white mt-0" role="contentinfo">
       {/* Gradient transition from main content */}
       <div className="absolute -top-16 left-0 right-0 h-16 bg-gradient-to-b from-transparent to-neutral-950 pointer-events-none" />
 
-      {/* CTA Banner with ScrollReveal */}
+      {/* CTA Banner */}
       <div className="container mx-auto px-6 lg:px-8 pt-20 pb-12">
-        <motion.div
-          className="relative overflow-hidden rounded-3xl gradient-border-animated p-8 md:p-12 mb-16"
-          style={{ perspective: 800 }}
-          initial={{ opacity: 0, y: 40, rotateX: 6 }}
-          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.8, ease: easeOut }}
-        >
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-900 to-neutral-800 border border-neutral-700/50 p-8 md:p-12 mb-16">
           {/* Decorative orb */}
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-neutral-700 rounded-full blur-[100px] opacity-30" />
 
@@ -79,70 +61,40 @@ const Footer = () => {
               </h3>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <MagneticButton strength={0.2}>
-                <ContactButton
-                  getQuote={true}
-                  headerText="Get a free quote for your project today!!"
-                  btnText="Get a Free Quote"
-                />
-              </MagneticButton>
-              <MagneticButton strength={0.2}>
-                <ContactButton
-                  showProjectType={true}
-                  headerText="How can we help you with your project?"
-                  btnText="Discuss Project"
-                />
-              </MagneticButton>
+              <ContactButton
+                getQuote={true}
+                headerText="Get a free quote for your project today!!"
+                btnText="Get a Free Quote"
+              />
+              <ContactButton
+                showProjectType={true}
+                headerText="How can we help you with your project?"
+                btnText="Discuss Project"
+              />
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Social Strip with staggered entrance */}
-        <motion.div
-          className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 pb-10 border-b border-neutral-800"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.5 }}
-        >
+        {/* Social Strip */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 mb-12 pb-10 border-b border-neutral-800">
           <p className="text-neutral-400 text-sm font-medium">
             Get connected with us on social networks
           </p>
-          <div className="flex items-center gap-2">
-            {socialLinks.map(({ icon: Icon, label, href, hoverColor }, index) => (
-              <motion.div
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {socialLinks.map(({ icon: Icon, label, href, hoverColor }) => (
+              <a
                 key={label}
-                initial={{ opacity: 0, scale: 0.5 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.4,
-                  delay: index * 0.06,
-                  type: 'spring',
-                  stiffness: 260,
-                  damping: 15,
-                }}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Follow us on ${label}`}
+                className={`w-10 h-10 flex items-center justify-center rounded-full bg-neutral-800/80 text-neutral-500 ${hoverColor} hover:bg-neutral-700/80 transition-all duration-200 hover:scale-110`}
               >
-                <MagneticButton strength={0.3}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Follow us on ${label}`}
-                    className={`w-10 h-10 flex items-center justify-center rounded-full bg-neutral-800/80 text-neutral-500 ${hoverColor} hover:bg-neutral-700/80 transition-all duration-200`}
-                  >
-                    <motion.span
-                      whileHover={{ scale: 1.2 }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-                    >
-                      <Icon className="text-sm" />
-                    </motion.span>
-                  </a>
-                </MagneticButton>
-              </motion.div>
+                <Icon className="text-sm" />
+              </a>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
@@ -226,7 +178,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-neutral-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
-          <p className="text-neutral-500 text-xs">
+          <p className="text-neutral-600 text-xs">
             Copyright &copy; 2020 - {currentDate.getFullYear()}{" "}
             <a
               className="text-neutral-400 hover:text-white transition-colors"
@@ -238,7 +190,7 @@ const Footer = () => {
             </a>
           </p>
           <div className="flex items-center gap-6">
-            <p className="text-neutral-500 text-xs">
+            <p className="text-neutral-600 text-xs">
               Designed & Developed by{" "}
               <a
                 className="text-neutral-400 hover:text-white transition-colors"
@@ -249,17 +201,14 @@ const Footer = () => {
                 Abhishek Sharma
               </a>
             </p>
-            {/* Scroll to top with animation */}
-            <motion.button
-              onClick={scrollToTop}
-              className="w-8 h-8 rounded-full bg-neutral-800 hover:bg-neutral-700 flex items-center justify-center text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            {/* Scroll to top */}
+            <a
+              href="#Home"
+              className="w-8 h-8 rounded-full bg-neutral-800 hover:bg-neutral-700 flex items-center justify-center text-neutral-400 hover:text-white transition-all hover:scale-110"
               aria-label="Scroll to top"
-              whileHover={{ scale: 1.15, y: -2 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 15 }}
             >
               <FaArrowUp className="text-xs" />
-            </motion.button>
+            </a>
           </div>
         </div>
       </div>

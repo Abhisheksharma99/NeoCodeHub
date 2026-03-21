@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, CheckCircle, ArrowRight } from 'lucide-react'
+import { X } from 'lucide-react'
 import Image from 'next/image';
 import Discuss from '../assets/Discuss.svg';
 import Invoice from "../assets/Invoice-bro.svg"
@@ -18,16 +17,7 @@ interface ContactFormPopupProps {
   onClose: () => void
 }
 
-const easeOut = [0.16, 1, 0.3, 1] as const;
-
-const fieldVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, delay: 0.15 + i * 0.07, ease: easeOut },
-  }),
-};
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, getQuote = false, showProjectType = false, isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -37,9 +27,10 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, getQuot
     message: '',
     phone: ''
   })
-  const [mounted, setMounted] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const projectTypes = [
     'Web Development',
@@ -59,43 +50,10 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, getQuot
 
   const resetForm = () => {
     setFormData({ name: '', email: '', message: '', projectType: '', phone: '' })
-    setSubmitted(false)
+    setErrors({})
+    setSubmitError('')
+    setIsSubmitted(false)
   }
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpen])
-
-  // Reset on close
-  useEffect(() => {
-    if (!isOpen) {
-      const timer = setTimeout(() => {
-        resetForm()
-      }, 300)
-      return () => clearTimeout(timer)
-    }
-  }, [isOpen])
-
-  // Escape key to close
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    if (isOpen) document.addEventListener('keydown', handleEsc)
-    return () => document.removeEventListener('keydown', handleEsc)
-  }, [isOpen, onClose])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -113,17 +71,52 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, getQuot
     }
   }, [isOpen, onClose])
 
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm()
+    }
+  }, [isOpen])
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.name.trim()) newErrors.name = 'Name is required'
+    else if (formData.name.trim().length > 100) newErrors.name = 'Name is too long'
+
+    if (!formData.email.trim()) newErrors.email = 'Email is required'
+    else if (!EMAIL_REGEX.test(formData.email)) newErrors.email = 'Please enter a valid email'
+
+    if (getQuote && !formData.phone.trim()) newErrors.phone = 'Phone number is required'
+
+    if (!formData.message.trim()) newErrors.message = 'Message is required'
+    else if (formData.message.trim().length > 2000) newErrors.message = 'Message is too long'
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
+    }
   }
 
   const handlePhoneChange = (value: string) => {
     setFormData(prevState => ({ ...prevState, phone: value }))
+    if (errors.phone) {
+      setErrors(prev => ({ ...prev, phone: '' }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitError('')
+
+    if (!validate()) return
+
+    setIsSubmitting(true)
     try {
       await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '',
@@ -131,395 +124,219 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ headerText, getQuot
         formData,
         process.env.NEXT_PUBLIC_EMAILJS_USER_ID || ''
       )
-      setSubmitted(true)
-      setTimeout(() => {
-        onClose()
-      }, 2200)
+      setIsSubmitted(true)
     } catch {
-      // Silently handle error - could add toast notification here
+      setSubmitError('Failed to send. Please try again later.')
     }
+    setIsSubmitting(false)
   }
 
-  const filledCount = [formData.name, formData.email, formData.message].filter(Boolean).length
-    + (getQuote && formData.phone ? 1 : 0)
-    + (showProjectType && formData.projectType ? 1 : 0)
-  const totalFields = 3 + (getQuote ? 1 : 0) + (showProjectType ? 1 : 0)
-  const progress = totalFields > 0 ? (filledCount / totalFields) * 100 : 0
-
-  if (!mounted) return null
-
-  return createPortal(
+  return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 99999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(10, 10, 10, 0.6)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/40 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="contact-popup-title"
         >
           <motion.div
             ref={formRef}
-            initial={{ scale: 0.92, opacity: 0, y: 30 }}
+            initial={{ scale: 0.95, opacity: 0, y: 10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-            style={{
-              position: 'relative',
-              width: 'calc(100% - 2rem)',
-              maxWidth: '56rem',
-              maxHeight: '90vh',
-              borderRadius: '1.5rem',
-              overflow: 'hidden',
-              backgroundColor: '#ffffff',
-              boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0,0,0,0.05)',
-              display: 'flex',
-              flexDirection: window.innerWidth >= 768 ? 'row' : 'column',
-            }}
+            exit={{ scale: 0.95, opacity: 0, y: 10 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
           >
-            {/* Progress bar at top */}
-            <motion.div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                height: '3px',
-                zIndex: 20,
-                background: 'linear-gradient(90deg, #171717, #525252, #a3a3a3)',
-                borderRadius: '0 2px 2px 0',
-              }}
-              initial={{ width: '0%' }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4, ease: easeOut }}
-            />
-
             {/* Close Button */}
-            <motion.button
+            <button
               type="button"
               onClick={onClose}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
-              className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-neutral-900/5 text-neutral-400 hover:bg-neutral-900 hover:text-white transition-colors z-10"
-              aria-label="Close"
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 transition-all z-10"
+              aria-label="Close dialog"
             >
-              <X size={16} strokeWidth={2.5} />
-            </motion.button>
+              <X size={16} />
+            </button>
 
             {/* Image Side */}
-            <motion.div
-              className="w-full md:w-1/2 relative shrink-0 overflow-hidden"
-              style={{
-                height: window.innerWidth >= 768 ? 'auto' : '180px',
-                background: 'linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)',
-              }}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.1, ease: easeOut }}
-            >
-              {/* Decorative gradient orb */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: '-30%',
-                  right: '-20%',
-                  width: '70%',
-                  height: '70%',
-                  background: 'radial-gradient(circle, rgba(23,23,23,0.06) 0%, transparent 70%)',
-                  borderRadius: '50%',
-                  pointerEvents: 'none',
-                }}
-              />
+            <div className="w-full md:w-1/2 h-48 md:h-auto relative bg-neutral-50">
               <Image
                 src={getQuote ? Invoice : Discuss}
-                alt="Contact Us"
+                alt={getQuote ? "Get a quote illustration" : "Contact discussion illustration"}
                 fill
-                style={{ objectFit: 'contain' }}
-                className="absolute inset-0 p-6 md:p-8"
+                style={{ objectFit: 'cover' }}
+                className="absolute inset-0 p-4"
               />
-              {/* Bottom label on image side */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                style={{
-                  position: 'absolute',
-                  bottom: '16px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  background: 'rgba(255,255,255,0.85)',
-                  backdropFilter: 'blur(8px)',
-                  padding: '6px 16px',
-                  borderRadius: '9999px',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: '#525252',
-                  border: '1px solid rgba(0,0,0,0.05)',
-                  whiteSpace: 'nowrap' as const,
-                }}
-              >
-                {getQuote ? 'Get your free quote today' : 'We respond within 24 hours'}
-              </motion.div>
-            </motion.div>
+            </div>
 
             {/* Form Side */}
-            <div className="w-full md:w-1/2 overflow-y-auto" style={{ padding: window.innerWidth >= 768 ? '2rem' : '1.5rem' }}>
-              <AnimatePresence mode="wait">
-                {submitted ? (
-                  <motion.div
-                    key="success"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                    className="flex flex-col items-center justify-center text-center py-12"
-                  >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.1 }}
-                    >
-                      <CheckCircle size={56} className="text-neutral-900 mb-4" strokeWidth={1.5} />
-                    </motion.div>
-                    <motion.h3
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.25 }}
-                      className="font-heading font-bold text-2xl text-neutral-900 mb-2 tracking-tight"
-                    >
-                      Message Sent!
-                    </motion.h3>
-                    <motion.p
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.35 }}
-                      className="text-neutral-500 text-sm max-w-xs"
-                    >
-                      Thank you for reaching out. We&apos;ll get back to you within 24 hours.
-                    </motion.p>
-                    <motion.div
-                      initial={{ width: '100%' }}
-                      animate={{ width: '0%' }}
-                      transition={{ duration: 2, delay: 0.2, ease: 'linear' }}
-                      style={{
-                        height: '2px',
-                        background: '#171717',
-                        borderRadius: '2px',
-                        marginTop: '24px',
-                      }}
+            <div className="w-full md:w-1/2 p-6 md:p-8">
+              <h2 id="contact-popup-title" className="text-xl md:text-2xl font-heading font-bold mb-6 text-neutral-900 tracking-tight">
+                {headerText}
+              </h2>
+
+              {isSubmitted ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-8"
+                  role="status"
+                >
+                  <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="text-neutral-900 font-heading font-bold text-lg mb-1">Thank you!</p>
+                  <p className="text-neutral-400 text-sm">We will get back to you soon.</p>
+                </motion.div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                  <div>
+                    <label htmlFor="popup-name" className="block text-xs font-medium text-neutral-400 mb-1.5">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      id="popup-name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      maxLength={100}
+                      className={`form-input-modern text-sm ${errors.name ? 'border-b-red-400' : ''}`}
+                      placeholder="Your Name"
+                      aria-required="true"
+                      aria-invalid={!!errors.name}
+                      aria-describedby={errors.name ? 'popup-name-error' : undefined}
                     />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="form"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    {errors.name && (
+                      <p id="popup-name-error" className="text-red-400 text-xs mt-1" role="alert">{errors.name}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="popup-email" className="block text-xs font-medium text-neutral-400 mb-1.5">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="popup-email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={`form-input-modern text-sm ${errors.email ? 'border-b-red-400' : ''}`}
+                      placeholder="your@email.com"
+                      aria-required="true"
+                      aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? 'popup-email-error' : undefined}
+                    />
+                    {errors.email && (
+                      <p id="popup-email-error" className="text-red-400 text-xs mt-1" role="alert">{errors.email}</p>
+                    )}
+                  </div>
+
+                  {getQuote && (
+                    <div>
+                      <label htmlFor="popup-phone" className="sr-only">Phone Number</label>
+                      <PhoneInput
+                        country={'in'}
+                        value={formData.phone}
+                        onChange={handlePhoneChange}
+                        inputProps={{
+                          id: 'popup-phone',
+                          name: 'phone',
+                          'aria-required': 'true',
+                          'aria-label': 'Phone number',
+                          className: 'form-input-modern text-sm !pl-12',
+                          placeholder: 'Enter Phone No.',
+                        }}
+                        containerClass="w-full"
+                        buttonStyle={{
+                          width: 42,
+                          background: 'transparent',
+                          border: 'none',
+                          borderBottom: '1.5px solid #e5e5e5',
+                          borderRadius: 0,
+                        }}
+                      />
+                      {errors.phone && (
+                        <p className="text-red-400 text-xs mt-1" role="alert">{errors.phone}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {showProjectType && (
+                    <div>
+                      <label htmlFor="popup-projectType" className="block text-xs font-medium text-neutral-400 mb-1.5">
+                        Project Type
+                      </label>
+                      <select
+                        id="popup-projectType"
+                        name="projectType"
+                        value={formData.projectType}
+                        onChange={handleChange}
+                        className="form-input-modern text-sm bg-transparent cursor-pointer"
+                      >
+                        <option value="">Select a project type</option>
+                        {projectTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  <div>
+                    <label htmlFor="popup-message" className="block text-xs font-medium text-neutral-400 mb-1.5">
+                      Message
+                    </label>
+                    <textarea
+                      id="popup-message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      rows={2}
+                      maxLength={2000}
+                      className={`form-input-modern text-sm resize-none ${errors.message ? 'border-b-red-400' : ''}`}
+                      placeholder="I want to discuss..."
+                      aria-required="true"
+                      aria-invalid={!!errors.message}
+                      aria-describedby={errors.message ? 'popup-message-error' : undefined}
+                    ></textarea>
+                    {errors.message && (
+                      <p id="popup-message-error" className="text-red-400 text-xs mt-1" role="alert">{errors.message}</p>
+                    )}
+                  </div>
+
+                  {submitError && (
+                    <p className="text-red-400 text-xs" role="alert">{submitError}</p>
+                  )}
+
+                  <motion.button
+                    type="submit"
+                    disabled={isSubmitting}
+                    whileHover={isSubmitting ? {} : { scale: 1.02 }}
+                    whileTap={isSubmitting ? {} : { scale: 0.98 }}
+                    className={`shining-button rounded-full w-full py-3 px-4 font-heading font-semibold text-sm tracking-tight focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 transition-all ${
+                      isSubmitting
+                        ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
+                        : 'bg-neutral-900 text-white hover:bg-neutral-800'
+                    }`}
+                    aria-busy={isSubmitting}
                   >
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, ease: easeOut }}
-                    >
-                      <p className="text-xs font-medium text-neutral-400 uppercase tracking-[0.15em] mb-2">
-                        {getQuote ? 'Free Quote' : 'Get in Touch'}
-                      </p>
-                      <h2 className="text-xl md:text-2xl font-heading font-bold mb-6 text-neutral-900 tracking-tight leading-snug">
-                        {headerText}
-                      </h2>
-                    </motion.div>
-
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                      <motion.div custom={0} variants={fieldVariants} initial="hidden" animate="visible">
-                        <label htmlFor="popup-name" className="block text-xs font-medium text-neutral-400 mb-1.5">
-                          Name
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            id="popup-name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            onFocus={() => setFocusedField('name')}
-                            onBlur={() => setFocusedField(null)}
-                            required
-                            className="form-input-modern text-sm"
-                            placeholder="Your Name"
-                          />
-                          {focusedField === 'name' && (
-                            <motion.div
-                              layoutId="field-highlight"
-                              className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-5 bg-neutral-900 rounded-full"
-                              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                            />
-                          )}
-                        </div>
-                      </motion.div>
-
-                      <motion.div custom={1} variants={fieldVariants} initial="hidden" animate="visible">
-                        <label htmlFor="popup-email" className="block text-xs font-medium text-neutral-400 mb-1.5">
-                          Email
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="email"
-                            id="popup-email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            onFocus={() => setFocusedField('email')}
-                            onBlur={() => setFocusedField(null)}
-                            required
-                            className="form-input-modern text-sm"
-                            placeholder="your@email.com"
-                          />
-                          {focusedField === 'email' && (
-                            <motion.div
-                              layoutId="field-highlight"
-                              className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-5 bg-neutral-900 rounded-full"
-                              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                            />
-                          )}
-                        </div>
-                      </motion.div>
-
-                      {getQuote && (
-                        <motion.div custom={2} variants={fieldVariants} initial="hidden" animate="visible">
-                          <PhoneInput
-                            country={'in'}
-                            value={formData.phone}
-                            onChange={handlePhoneChange}
-                            inputProps={{
-                              name: 'phone',
-                              required: true,
-                              className: 'form-input-modern text-sm !pl-12',
-                              placeholder: 'Enter Phone No.',
-                            }}
-                            containerClass="w-full"
-                            buttonStyle={{
-                              width: 42,
-                              background: 'transparent',
-                              border: 'none',
-                              borderBottom: '1.5px solid #e5e5e5',
-                              borderRadius: 0,
-                            }}
-                          />
-                        </motion.div>
-                      )}
-
-                      {showProjectType && (
-                        <motion.div custom={getQuote ? 3 : 2} variants={fieldVariants} initial="hidden" animate="visible">
-                          <label htmlFor="popup-projectType" className="block text-xs font-medium text-neutral-400 mb-1.5">
-                            Project Type
-                          </label>
-                          <div className="relative">
-                            <select
-                              id="popup-projectType"
-                              name="projectType"
-                              value={formData.projectType}
-                              onChange={handleChange}
-                              onFocus={() => setFocusedField('projectType')}
-                              onBlur={() => setFocusedField(null)}
-                              className="form-input-modern text-sm bg-transparent cursor-pointer"
-                            >
-                              <option value="">Select a project type</option>
-                              {projectTypes.map((type) => (
-                                <option key={type} value={type}>
-                                  {type}
-                                </option>
-                              ))}
-                            </select>
-                            {focusedField === 'projectType' && (
-                              <motion.div
-                                layoutId="field-highlight"
-                                className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-5 bg-neutral-900 rounded-full"
-                                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                              />
-                            )}
-                          </div>
-                        </motion.div>
-                      )}
-
-                      <motion.div custom={getQuote && showProjectType ? 4 : getQuote || showProjectType ? 3 : 2} variants={fieldVariants} initial="hidden" animate="visible">
-                        <label htmlFor="popup-message" className="block text-xs font-medium text-neutral-400 mb-1.5">
-                          Message
-                        </label>
-                        <div className="relative">
-                          <textarea
-                            id="popup-message"
-                            name="message"
-                            value={formData.message}
-                            onChange={handleChange}
-                            onFocus={() => setFocusedField('message')}
-                            onBlur={() => setFocusedField(null)}
-                            required
-                            rows={2}
-                            className="form-input-modern text-sm resize-none"
-                            placeholder="Tell us about your project..."
-                          ></textarea>
-                          {focusedField === 'message' && (
-                            <motion.div
-                              layoutId="field-highlight"
-                              className="absolute -left-3 top-4 w-1 h-5 bg-neutral-900 rounded-full"
-                              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                            />
-                          )}
-                        </div>
-                      </motion.div>
-
-                      <motion.div
-                        custom={5}
-                        variants={fieldVariants}
-                        initial="hidden"
-                        animate="visible"
-                      >
-                        <motion.button
-                          type="submit"
-                          whileHover={{ scale: 1.02, gap: '12px' }}
-                          whileTap={{ scale: 0.98 }}
-                          className="shining-button rounded-full w-full py-3.5 px-5 bg-neutral-900 text-white font-heading font-semibold text-sm tracking-tight hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 transition-all inline-flex items-center justify-center gap-2"
-                        >
-                          <Send size={15} />
-                          Send Message
-                          <ArrowRight size={15} />
-                        </motion.button>
-                      </motion.div>
-
-                      <motion.p
-                        custom={6}
-                        variants={fieldVariants}
-                        initial="hidden"
-                        animate="visible"
-                        className="text-center text-[0.7rem] text-neutral-400 pt-1"
-                      >
-                        Your information is secure and will never be shared.
-                      </motion.p>
-                    </form>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                  </motion.button>
+                </form>
+              )}
             </div>
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>,
-    document.body
+    </AnimatePresence>
   )
 }
 
