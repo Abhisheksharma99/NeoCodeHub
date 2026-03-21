@@ -61,13 +61,12 @@ const NavbarAndHero = () => {
   );
 
   const menuItems = useMemo(() => [
-    { label: 'Home', href: '#Home' },
-    { label: 'Services', href: '#Services' },
-    { label: 'Tech', href: '#Tech' },
+    { label: 'Home', href: '/#Home' },
+    { label: 'Services', href: '/services' },
     { label: 'Portfolio', href: '/portfolio' },
     { label: 'Blog', href: '/blog' },
-    { label: 'About', href: '#About' },
-    { label: 'Contact', href: '#Contact' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
   ], []);
 
   const menuVariants = {
