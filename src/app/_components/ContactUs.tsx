@@ -1,15 +1,17 @@
 'use client'
 
+import { useRef } from 'react'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { FaAngular, FaDatabase, FaNode, FaPython, FaReact } from 'react-icons/fa';
 import { Button } from './Button';
 import contactUs from '../assets/contactUs.svg'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import emailjs from '@emailjs/browser'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import MagneticButton from './MagneticButton';
+import ParallaxDoodle from './ParallaxDoodle';
 
 const icons = [
   { name: 'React', src: <FaReact /> },
@@ -41,6 +43,17 @@ export default function ContactUs() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [activeIcon, setActiveIcon] = useState(0)
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+
+  // Scroll-linked panel entrance
+  const leftX = useTransform(scrollYProgress, [0.1, 0.35], [-100, 0]);
+  const rightX = useTransform(scrollYProgress, [0.15, 0.4], [100, 0]);
+  const sectionOpacity = useTransform(scrollYProgress, [0.05, 0.25], [0, 1]);
+
+  // Background orb scroll-linked scale
+  const orbScale = useTransform(scrollYProgress, [0, 0.5], [0.8, 1.2]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -97,11 +110,11 @@ export default function ContactUs() {
   }
 
   return (
-    <section id="Contact" className="relative">
+    <section id="contact" className="relative" ref={sectionRef}>
       {/* Background accent */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-neutral-100 rounded-full blur-[120px] opacity-50 pointer-events-none" />
 
-      {/* Subtle parallax background orb */}
+      {/* Subtle parallax background orb - scroll-linked scale */}
       <motion.div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-neutral-200/[0.06] rounded-full blur-3xl pointer-events-none"
         animate={{
@@ -113,6 +126,7 @@ export default function ContactUs() {
           repeat: Infinity,
           ease: 'easeInOut',
         }}
+        style={{ scale: orbScale }}
       />
 
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28 relative z-10">
@@ -167,139 +181,137 @@ export default function ContactUs() {
 
           {/* Center + Right: Info & Form */}
           <div className="flex-1 flex flex-col md:flex-row gap-8">
-            {/* Info - slide in from left with parallax */}
-            <motion.div
-              className="w-full md:w-1/2"
-              style={{ perspective: 800 }}
-              initial={{ opacity: 0, x: -40, rotateY: 5 }}
-              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.8, delay: 0.15, ease: easeOut }}
-            >
-              <h3 className="text-2xl font-heading font-bold tracking-tight text-neutral-900 mb-3">
-                Want to discuss your idea?
-              </h3>
-              <p className="text-neutral-700 mb-6 leading-relaxed">
-                Hi, We are excited to hear about your project.
-              </p>
-              <Image
-                src={contactUs}
-                alt="Contact Us"
-                width={320}
-                height={140}
-                className="mb-6 drop-shadow-sm"
-              />
-              <p className="text-neutral-600 text-sm">
-                Drop us a line and we will connect you to our experts.
-              </p>
+            {/* Info - slide in from left with scroll-linked parallax */}
+            <motion.div style={{ x: leftX, opacity: sectionOpacity }}>
+              <motion.div
+                className="w-full md:w-full"
+                style={{ perspective: 800 }}
+              >
+                <h3 className="text-2xl font-heading font-bold tracking-tight text-neutral-900 mb-3">
+                  Want to discuss your idea?
+                </h3>
+                <p className="text-neutral-700 mb-6 leading-relaxed">
+                  Hi, We are excited to hear about your project.
+                </p>
+                <ParallaxDoodle speed={-0.1} className="relative">
+                  <Image
+                    src={contactUs}
+                    alt="Contact Us"
+                    width={320}
+                    height={140}
+                    className="mb-6 drop-shadow-sm"
+                  />
+                </ParallaxDoodle>
+                <p className="text-neutral-600 text-sm">
+                  Drop us a line and we will connect you to our experts.
+                </p>
+              </motion.div>
             </motion.div>
 
-            {/* Form - slide in from right */}
-            <motion.div
-              className="w-full md:w-1/2"
-              style={{ perspective: 800 }}
-              initial={{ opacity: 0, x: 40, rotateY: -5 }}
-              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.8, delay: 0.25, ease: easeOut }}
-            >
-              <div className="glass-card p-6 md:p-8">
-                <h3 className="text-lg font-heading font-bold tracking-tight text-neutral-900 mb-6">
-                  We are here to help you.
-                </h3>
-                <AnimatePresence>
-                  {!isSubmitted ? (
-                    <motion.form
-                      onSubmit={handleSubmit}
-                      className="space-y-5"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <div>
-                        <input
-                          type="text"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          placeholder="Your Name*"
-                          className={`form-input-modern ${errors.name ? 'border-b-red-400' : ''}`}
-                          required
-                        />
-                        {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
-                      </div>
-                      <div>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          placeholder="Email Address*"
-                          className={`form-input-modern ${errors.email ? 'border-b-red-400' : ''}`}
-                          required
-                        />
-                        {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
-                      </div>
-                      <div>
-                        <PhoneInput
-                          country={'in'}
-                          value={formData.phone}
-                          onChange={handlePhoneChange}
-                          inputProps={{
-                            name: 'phone',
-                            required: true,
-                            className: 'form-input-modern !pl-12',
-                            placeholder: 'Enter Phone No.',
-                          }}
-                          containerClass="w-full"
-                          buttonStyle={{
-                            width: 42,
-                            borderBottom: '1.5px solid #e5e5e5',
-                            background: 'transparent',
-                            border: 'none',
-                            borderRadius: 0,
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <textarea
-                          name="message"
-                          value={formData.message}
-                          onChange={handleChange}
-                          placeholder="How can we help you?"
-                          rows={2}
-                          className={`form-input-modern resize-none ${errors.message ? 'border-b-red-400' : ''}`}
-                          required
-                        ></textarea>
-                        {errors.message && <p className="text-red-400 text-xs mt-1.5">{errors.message}</p>}
-                      </div>
-                      <MagneticButton strength={0.15}>
-                        <Button
-                          type="submit"
-                          disabled={isSubmitting}
-                          text={isSubmitting ? 'Sending...' : 'Discuss Project'}
-                          btnClass="text-sm"
-                        />
-                      </MagneticButton>
-                    </motion.form>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="text-center py-8"
-                    >
-                      <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <p className="text-neutral-900 font-heading font-bold text-lg mb-1">Thank you!</p>
-                      <p className="text-neutral-600 text-sm">We will get back to you soon.</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+            {/* Form - slide in from right with scroll-linked parallax */}
+            <motion.div style={{ x: rightX, opacity: sectionOpacity }}>
+              <motion.div
+                className="w-full md:w-full"
+                style={{ perspective: 800 }}
+              >
+                <div className="glass-card p-6 md:p-8">
+                  <h3 className="text-lg font-heading font-bold tracking-tight text-neutral-900 mb-6">
+                    We are here to help you.
+                  </h3>
+                  <AnimatePresence>
+                    {!isSubmitted ? (
+                      <motion.form
+                        onSubmit={handleSubmit}
+                        className="space-y-5"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <div>
+                          <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            placeholder="Your Name*"
+                            className={`form-input-modern ${errors.name ? 'border-b-red-400' : ''}`}
+                            required
+                          />
+                          {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
+                        </div>
+                        <div>
+                          <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Email Address*"
+                            className={`form-input-modern ${errors.email ? 'border-b-red-400' : ''}`}
+                            required
+                          />
+                          {errors.email && <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>}
+                        </div>
+                        <div>
+                          <PhoneInput
+                            country={'in'}
+                            value={formData.phone}
+                            onChange={handlePhoneChange}
+                            inputProps={{
+                              name: 'phone',
+                              required: true,
+                              className: 'form-input-modern !pl-12',
+                              placeholder: 'Enter Phone No.',
+                            }}
+                            containerClass="w-full"
+                            buttonStyle={{
+                              width: 42,
+                              borderBottom: '1.5px solid #e5e5e5',
+                              background: 'transparent',
+                              border: 'none',
+                              borderRadius: 0,
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <textarea
+                            name="message"
+                            value={formData.message}
+                            onChange={handleChange}
+                            placeholder="How can we help you?"
+                            rows={2}
+                            className={`form-input-modern resize-none ${errors.message ? 'border-b-red-400' : ''}`}
+                            required
+                          ></textarea>
+                          {errors.message && <p className="text-red-400 text-xs mt-1.5">{errors.message}</p>}
+                        </div>
+                        <MagneticButton strength={0.15}>
+                          <Button
+                            type="submit"
+                            disabled={isSubmitting}
+                            text={isSubmitting ? 'Sending...' : 'Discuss Project'}
+                            btnClass="text-sm"
+                          />
+                        </MagneticButton>
+                      </motion.form>
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="text-center py-8"
+                      >
+                        <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <svg className="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <p className="text-neutral-900 font-heading font-bold text-lg mb-1">Thank you!</p>
+                        <p className="text-neutral-600 text-sm">We will get back to you soon.</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
             </motion.div>
           </div>
         </motion.div>

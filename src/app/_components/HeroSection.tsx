@@ -1,147 +1,176 @@
 'use client';
 
+import { useRef } from "react";
 import { Button } from "./Button";
 import Image from "next/image";
 import Link from "next/link";
 import HeroImage from "../assets/HeroImage.svg";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import ContactButton from "./ContactButton";
 import MagneticButton from "./MagneticButton";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
 const HeroSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Hero text content: fades out, rises, and scales down as user scrolls past
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.3, 0.6], [1, 1, 0]);
+  const contentY = useTransform(scrollYProgress, [0, 0.6], [0, -80]);
+  const contentScale = useTransform(scrollYProgress, [0, 0.3, 0.6], [1, 1, 0.9]);
+
+  // Hero image: parallaxes slower (moves up at different rate)
+  const imageY = useTransform(scrollYProgress, [0, 1], [0, -120]);
+
+  // Background ambient orbs: scroll-linked opacity fade
+  const orbOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.3]);
+
   return (
-    <main className="relative pt-24 md:pt-28 overflow-hidden">
+    <main id="hero" ref={containerRef} className="relative pt-24 md:pt-28 overflow-hidden">
       {/* Ambient gradient orbs for depth */}
-      <div className="absolute top-16 -right-40 w-[500px] h-[500px] bg-neutral-200/50 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-20 -left-40 w-[400px] h-[400px] bg-neutral-100/60 rounded-full blur-[100px] pointer-events-none" />
+      <motion.div
+        className="absolute top-16 -right-40 w-[500px] h-[500px] bg-neutral-200/50 rounded-full blur-[120px] pointer-events-none"
+        style={{ opacity: orbOpacity }}
+      />
+      <motion.div
+        className="absolute -bottom-20 -left-40 w-[400px] h-[400px] bg-neutral-100/60 rounded-full blur-[100px] pointer-events-none"
+        style={{ opacity: orbOpacity }}
+      />
 
       <div
         id="Home"
         className="container mx-auto px-6 lg:px-8 py-16 md:py-24 flex flex-col md:flex-row items-center relative z-10"
       >
-        {/* Text Content */}
+        {/* Text Content — scroll-linked fade/rise/scale wrapper */}
         <motion.div
+          style={{ opacity: contentOpacity, y: contentY, scale: contentScale }}
           className="md:w-1/2 mb-12 md:mb-0"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: easeOut }}
         >
-          {/* Status badge */}
           <motion.div
-            className="section-badge mb-8"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1, ease: easeOut }}
+            transition={{ duration: 0.8, ease: easeOut }}
           >
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-neutral-600">Available for New Projects</span>
-          </motion.div>
-
-          <h1
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold text-neutral-900 leading-[1.05] font-heading tracking-tight"
-            style={{ perspective: 600 }}
-          >
-            {['Transforming', 'Ideas'].map((word, i) => (
-              <motion.span
-                key={i}
-                className="inline-block mr-[0.3em]"
-                style={{ transformStyle: 'preserve-3d' }}
-                initial={{ opacity: 0, y: 40, rotateX: -40 }}
-                animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                transition={{ duration: 0.7, delay: 0.15 + i * 0.1, ease: easeOut }}
-              >
-                {word}
-              </motion.span>
-            ))}
-            <br />
-            {['into'].map((word, i) => (
-              <motion.span
-                key={i}
-                className="inline-block mr-[0.3em]"
-                style={{ transformStyle: 'preserve-3d' }}
-                initial={{ opacity: 0, y: 40, rotateX: -40 }}
-                animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                transition={{ duration: 0.7, delay: 0.35 + i * 0.1, ease: easeOut }}
-              >
-                {word}
-              </motion.span>
-            ))}
-            <motion.span
-              className="text-shimmer inline-block"
-              style={{ transformStyle: 'preserve-3d' }}
-              initial={{ opacity: 0, y: 40, rotateX: -40 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-              transition={{ duration: 0.8, delay: 0.45, ease: easeOut }}
+            {/* Status badge */}
+            <motion.div
+              className="section-badge mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1, ease: easeOut }}
             >
-              Digital Reality
-            </motion.span>
-          </h1>
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-neutral-600">Available for New Projects</span>
+            </motion.div>
 
-          {/* Subtitle with blur reveal */}
-          <motion.p
-            className="text-lg md:text-xl text-neutral-700 mt-6 mb-10 max-w-lg leading-relaxed"
-            initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ duration: 0.8, delay: 0.3, ease: easeOut }}
-          >
-            Elevating businesses with cutting-edge solutions in web, mobile, and
-            AI development.
-          </motion.p>
-
-          <motion.div
-            className="flex flex-wrap items-center gap-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.35, ease: easeOut }}
-          >
-            <MagneticButton strength={0.2}>
-              <Link href="/projects">
-                <Button text="See Our Work →" btnClass="px-8 py-4 text-base" />
-              </Link>
-            </MagneticButton>
-            <MagneticButton strength={0.2}>
-              <ContactButton
-                headerText="How can we help you with your project?"
-                showProjectType={true}
-                btnText="Get Free Quote"
-                getQuote={true}
-              />
-            </MagneticButton>
-          </motion.div>
-
-          {/* Trust indicators */}
-          <motion.div
-            className="flex items-center gap-6 mt-10 pt-8 border-t border-neutral-200/50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.7, delay: 0.5, ease: easeOut }}
-          >
-            <div className="flex -space-x-2">
-              {['RK', 'PS', 'AP', 'NK'].map((initials, i) => (
-                <div
+            <h1
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold text-neutral-900 leading-[1.05] font-heading tracking-tight"
+              style={{ perspective: 600 }}
+            >
+              {['Transforming', 'Ideas'].map((word, i) => (
+                <motion.span
                   key={i}
-                  className="w-8 h-8 rounded-full bg-neutral-900 border-2 border-white flex items-center justify-center text-[0.6rem] text-white font-bold"
+                  className="inline-block mr-[0.3em]"
+                  style={{ transformStyle: 'preserve-3d' }}
+                  initial={{ opacity: 0, y: 40, rotateX: -40 }}
+                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  transition={{ duration: 0.7, delay: 0.15 + i * 0.1, ease: easeOut }}
                 >
-                  {initials}
-                </div>
+                  {word}
+                </motion.span>
               ))}
-            </div>
-            <div>
-              <div className="flex items-center gap-1 text-amber-400 text-xs mb-0.5">
-                {'★★★★★'}
+              <br />
+              {['into'].map((word, i) => (
+                <motion.span
+                  key={i}
+                  className="inline-block mr-[0.3em]"
+                  style={{ transformStyle: 'preserve-3d' }}
+                  initial={{ opacity: 0, y: 40, rotateX: -40 }}
+                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  transition={{ duration: 0.7, delay: 0.35 + i * 0.1, ease: easeOut }}
+                >
+                  {word}
+                </motion.span>
+              ))}
+              <motion.span
+                className="text-shimmer inline-block"
+                style={{ transformStyle: 'preserve-3d' }}
+                initial={{ opacity: 0, y: 40, rotateX: -40 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{ duration: 0.8, delay: 0.45, ease: easeOut }}
+              >
+                Digital Reality
+              </motion.span>
+            </h1>
+
+            {/* Subtitle with blur reveal */}
+            <motion.p
+              className="text-lg md:text-xl text-neutral-700 mt-6 mb-10 max-w-lg leading-relaxed"
+              initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 0.8, delay: 0.3, ease: easeOut }}
+            >
+              Elevating businesses with cutting-edge solutions in web, mobile, and
+              AI development.
+            </motion.p>
+
+            <motion.div
+              className="flex flex-wrap items-center gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.35, ease: easeOut }}
+            >
+              <MagneticButton strength={0.2}>
+                <Link href="/projects">
+                  <Button text="See Our Work →" btnClass="px-8 py-4 text-base" />
+                </Link>
+              </MagneticButton>
+              <MagneticButton strength={0.2}>
+                <ContactButton
+                  headerText="How can we help you with your project?"
+                  showProjectType={true}
+                  btnText="Get Free Quote"
+                  getQuote={true}
+                />
+              </MagneticButton>
+            </motion.div>
+
+            {/* Trust indicators */}
+            <motion.div
+              className="flex items-center gap-6 mt-10 pt-8 border-t border-neutral-200/50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.5, ease: easeOut }}
+            >
+              <div className="flex -space-x-2">
+                {['RK', 'PS', 'AP', 'NK'].map((initials, i) => (
+                  <div
+                    key={i}
+                    className="w-8 h-8 rounded-full bg-neutral-900 border-2 border-white flex items-center justify-center text-[0.6rem] text-white font-bold"
+                  >
+                    {initials}
+                  </div>
+                ))}
               </div>
-              <p className="text-neutral-600 text-xs">
-                Trusted by <span className="text-neutral-700 font-semibold">30+</span> clients worldwide
-              </p>
-            </div>
+              <div>
+                <div className="flex items-center gap-1 text-amber-400 text-xs mb-0.5">
+                  {'★★★★★'}
+                </div>
+                <p className="text-neutral-600 text-xs">
+                  Trusted by <span className="text-neutral-700 font-semibold">30+</span> clients worldwide
+                </p>
+              </div>
+            </motion.div>
           </motion.div>
         </motion.div>
 
-        {/* Hero Image */}
+        {/* Hero Image — scroll-linked parallax */}
         <motion.div
           className="w-full md:w-1/2"
+          style={{ y: imageY }}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.15, ease: easeOut }}

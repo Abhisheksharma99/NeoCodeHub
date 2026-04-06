@@ -1,58 +1,74 @@
 [
   {
-    "id": "1",
-    "title": "E-Commerce Platform",
-    "description": "Full-stack marketplace with payment integration, inventory management, and real-time analytics dashboard",
-    "category": "Web Development",
-    "status": "completed",
-    "image": "",
-    "tags": [
-      "Next.js",
-      "Node.js",
-      "MongoDB",
-      "Stripe"
-    ]
-  },
-  {
-    "id": "2",
-    "title": "AI Chatbot System",
-    "description": "NLP-powered customer support chatbot with multi-language support and sentiment analysis",
+    "id": "proj-forgecadneo",
+    "title": "ForgeCadNeo",
+    "description": "AI-powered CAD reconstruction platform that converts 2D engineering drawings into manufacturing-grade 3D STEP files. Uses OpenCASCADE B-Rep kernel with GPT-4o vision to extract dimensions, tolerances, and features — reducing 2-8 hours of manual CAD work to approximately 15 minutes. Features multi-tenant architecture, Stripe credit system, and interactive Three.js 3D preview.",
     "category": "AI & ML",
     "status": "completed",
-    "image": "",
-    "tags": [
-      "Python",
-      "TensorFlow",
-      "React",
-      "FastAPI"
-    ]
+    "image": "https://res.cloudinary.com/duhyrtr2h/image/upload/v1775497406/forgecadneo_xwwq0z.png",
+    "tags": ["React", "FastAPI", "Three.js", "OpenCASCADE", "OpenAI", "PostgreSQL"]
   },
   {
-    "id": "3",
-    "title": "Healthcare Dashboard",
-    "description": "Real-time patient monitoring dashboard with HIPAA-compliant data handling and alerts",
-    "category": "Web Development",
-    "status": "in-progress",
-    "image": "",
-    "tags": [
-      "React",
-      "TypeScript",
-      "AWS",
-      "PostgreSQL"
-    ]
-  },
-  {
-    "id": "4",
-    "title": "Mobile Banking App",
-    "description": "Cross-platform mobile banking application with biometric authentication and real-time transactions",
-    "category": "Mobile Development",
+    "id": "proj-recruitpro",
+    "title": "NCHRecruitPro",
+    "description": "Enterprise AI-powered Applicant Tracking System and HRM platform with 40+ LangChain agents for resume matching, culture-fit scoring, predictive retention, and skill gap analysis. Features multi-tenant architecture, lead discovery crawlers, payroll management, and real-time analytics dashboards.",
+    "category": "AI & ML",
     "status": "completed",
-    "image": "",
-    "tags": [
-      "React Native",
-      "Node.js",
-      "Firebase",
-      "Plaid"
-    ]
+    "image": "https://res.cloudinary.com/duhyrtr2h/image/upload/v1775497406/nchrecruitpro_gxivu9.png",
+    "tags": ["Next.js", "LangChain", "PostgreSQL", "Groq", "Docker", "Python"]
+  },
+  {
+    "id": "proj-errandoo",
+    "title": "Errandoo",
+    "description": "Hyperlocal on-demand delivery and errand platform with real-time GPS tracking, in-task chat, OTP-verified handoffs, and Cashfree payments. Full-stack monorepo with Next.js web app, NestJS API, Flutter mobile app, and comprehensive production monitoring stack including Grafana, Loki, and Sentry.",
+    "category": "Web Development",
+    "status": "completed",
+    "image": "https://res.cloudinary.com/duhyrtr2h/image/upload/v1775497414/errandoo_kvl3zk.png",
+    "tags": ["Next.js", "NestJS", "Flutter", "PostgreSQL", "Socket.IO", "PostGIS"]
+  },
+  {
+    "id": "proj-prevadu",
+    "title": "Prevadu Health",
+    "description": "Comprehensive radiology and healthcare appointment management platform with patient portal, radiologist dashboard, and admin suite. Supports 27 master data modules, SuperPay payment gateway, Firebase push notifications, Microsoft 365 OAuth email, and SMS-based OTP authentication for the Egyptian healthcare market.",
+    "category": "Web Development",
+    "status": "completed",
+    "image": "https://res.cloudinary.com/duhyrtr2h/image/upload/v1775497410/prevadu_uuefpm.png",
+    "tags": ["Angular", "Node.js", "MySQL", "Sequelize", "Firebase", "AG-Grid"]
+  },
+  {
+    "id": "proj-appnly",
+    "title": "Appnly",
+    "description": "Professional service platform for Google Workspace migration and automation. Offers zero-downtime email migrations from legacy systems (Outlook, Exchange, Gmail, cPanel), Google Sheets and AppSheet automation, and DNS/email authentication setup. Trusted by 300+ clients and 20,000+ users globally.",
+    "category": "Web Development",
+    "status": "completed",
+    "image": "https://res.cloudinary.com/duhyrtr2h/image/upload/v1775497405/appnly_azb7tf.png",
+    "tags": ["Next.js", "GSAP", "Framer Motion", "EmailJS", "Tailwind CSS"]
+  },
+  {
+    "id": "proj-cygnet",
+    "title": "Cygnet Design",
+    "description": "Product design and engineering services platform for a Pune-based firm with 27+ years of experience. Features interactive 3D model viewer using Three.js, project portfolio with video demonstrations, blog system with CMS, and admin dashboard with analytics — serving automotive, construction, agriculture, and EV design industries.",
+    "category": "Web Development",
+    "status": "completed",
+    "image": "https://res.cloudinary.com/duhyrtr2h/image/upload/v1775497409/cygnet_eabpgn.png",
+    "tags": ["Next.js", "Three.js", "MongoDB", "NextAuth", "Recharts"]
+  },
+  {
+    "id": "proj-toofi",
+    "title": "Tooffi",
+    "description": "Personalized cakes and gifts marketplace connecting customers with passionate bakers and artisans. Features advanced filtering by flavor, occasion, and dietary preferences (vegan, gluten-free, sugar-free), baker profiles with ratings, location-based delivery with Leaflet maps, and OTP-based phone authentication.",
+    "category": "Web Development",
+    "status": "completed",
+    "image": "https://res.cloudinary.com/duhyrtr2h/image/upload/v1775497406/tooffi_j3nlfi.png",
+    "tags": ["Next.js", "Tailwind CSS", "Leaflet", "SWR", "Storybook"]
+  },
+  {
+    "id": "proj-leadsneoforge",
+    "title": "LeadsNeoForge",
+    "description": "AI-powered lead generation and marketing automation platform with autonomous Python agents for Reddit, LinkedIn, and Twitter outreach. Features n8n-backed workflow automation, Groq LLM content generation, multi-platform campaign scheduling, and real-time metrics tracking dashboard.",
+    "category": "AI & ML",
+    "status": "completed",
+    "image": "https://res.cloudinary.com/duhyrtr2h/image/upload/v1775497409/leadsforge_e31gyz.png",
+    "tags": ["Next.js", "NextAuth", "Groq", "n8n", "Python"]
   }
 ]

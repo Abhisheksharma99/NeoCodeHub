@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { motion, useInView, animate } from 'framer-motion';
+import { motion, useInView, animate, useScroll, useTransform } from 'framer-motion';
 
 const stats = [
   { value: 50, suffix: '+', label: 'Projects Delivered' },
@@ -83,18 +83,14 @@ function StatCard({
     <motion.div
       ref={cardRef}
       className="text-center relative p-6 rounded-2xl cursor-default"
+      initial={{ opacity: 0, scale: 0.8, y: 20 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
       style={{
         perspective: 600,
         transform: `perspective(600px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg)`,
         transition: 'transform 0.15s ease-out',
-      }}
-      initial={{ opacity: 0, y: 30, rotateX: 6 }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-      viewport={{ once: true }}
-      transition={{
-        duration: 0.7,
-        delay: index * 0.12,
-        ease: easeOut,
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -129,11 +125,26 @@ function StatCard({
 }
 
 export default function StatsSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+
+  // Background parallax for ambient glows
+  const glowY1 = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const glowY2 = useTransform(scrollYProgress, [0, 1], [0, 40]);
+
+  // Card scale and opacity on scroll
+  const cardScale = useTransform(scrollYProgress, [0.15, 0.45], [0.8, 1]);
+  const cardOpacity = useTransform(scrollYProgress, [0.1, 0.35], [0, 1]);
+
   return (
-    <section className="relative bg-neutral-950 py-16 md:py-24 overflow-hidden">
-      {/* Subtle ambient glows */}
-      <div className="absolute top-0 left-1/4 w-72 h-72 bg-neutral-800 rounded-full blur-[120px] opacity-40" />
-      <div className="absolute bottom-0 right-1/4 w-56 h-56 bg-neutral-800 rounded-full blur-[100px] opacity-30" />
+    <section id="stats" className="relative bg-neutral-950 py-16 md:py-24 overflow-hidden" ref={sectionRef}>
+      {/* Subtle ambient glows - scroll-linked parallax */}
+      <motion.div style={{ y: glowY1 }}>
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-neutral-800 rounded-full blur-[120px] opacity-40" />
+      </motion.div>
+      <motion.div style={{ y: glowY2 }}>
+        <div className="absolute bottom-0 right-1/4 w-56 h-56 bg-neutral-800 rounded-full blur-[100px] opacity-30" />
+      </motion.div>
 
       <div className="container mx-auto px-6 lg:px-8 relative z-10">
         <motion.p
@@ -146,11 +157,13 @@ export default function StatsSection() {
           Our Impact in Numbers
         </motion.p>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12" style={{ perspective: 800 }}>
-          {stats.map((stat, index) => (
-            <StatCard key={index} stat={stat} index={index} />
-          ))}
-        </div>
+        <motion.div style={{ scale: cardScale, opacity: cardOpacity }}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12" style={{ perspective: 800 }}>
+            {stats.map((stat, index) => (
+              <StatCard key={index} stat={stat} index={index} />
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );

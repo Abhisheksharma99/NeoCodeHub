@@ -1,6 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import Image from "next/image";
 import MobileImage from "../assets/Mobile App.png";
 import AiImage from "../assets/AI.png";
 import WebImage from "../assets/Web Design.png";
@@ -8,6 +10,7 @@ import Expertise from "../assets/Expertise.svg";
 import Innovation from "../assets/Innovation.svg";
 import Customer from "../assets/Customer relationship management-bro.svg";
 import { Card, ServiceData } from "./Card";
+import ParallaxDoodle from "./ParallaxDoodle";
 
 const services: ServiceData[] = [
   {
@@ -53,9 +56,28 @@ const chooseUs: ServiceData[] = [
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
+function ScrollRevealCard({ children, index, scrollYProgress, className = "" }: { children: React.ReactNode; index: number; scrollYProgress: MotionValue<number>; className?: string }) {
+  const start = 0.15 + index * 0.06;
+  const end = start + 0.12;
+  const y = useTransform(scrollYProgress, [start, end], [80, 0]);
+  const opacity = useTransform(scrollYProgress, [start, end], [0, 1]);
+  const scale = useTransform(scrollYProgress, [start, end], [0.9, 1]);
+  return <motion.div className={className} style={{ y, opacity, scale }}>{children}</motion.div>;
+}
+
 export default function Services() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+
   return (
-    <section id="Services" className="relative">
+    <section id="services" className="relative overflow-hidden" ref={sectionRef}>
+      <ParallaxDoodle speed={-0.12} className="absolute top-20 right-[5%] hidden lg:block z-0 opacity-20 pointer-events-none">
+        <Image src={Expertise} alt="" width={180} height={180} />
+      </ParallaxDoodle>
+      <ParallaxDoodle speed={-0.2} className="absolute bottom-32 left-[3%] hidden lg:block z-0 opacity-15 pointer-events-none">
+        <Image src={Innovation} alt="" width={160} height={160} />
+      </ParallaxDoodle>
+
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28">
         {/* Section Header */}
         <motion.div
@@ -79,23 +101,9 @@ export default function Services() {
 
         <div className="flex flex-wrap -mx-4" style={{ perspective: 800 }}>
           {services.map((service, index) => (
-            <motion.div
-              key={index}
-              className="w-full md:w-1/2 lg:w-1/3 flex"
-              style={{ transformStyle: 'preserve-3d' }}
-              initial={{ opacity: 0, y: 50, rotateX: 6 }}
-              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{
-                duration: 0.8,
-                delay: index * 0.12,
-                ease: easeOut,
-              }}
-            >
-              <div className="p-4 flex w-full" style={{ transform: 'translateZ(20px)' }}>
-                <Card {...service} noOuterWrapper />
-              </div>
-            </motion.div>
+            <ScrollRevealCard key={index} index={index} scrollYProgress={scrollYProgress} className="w-full md:w-1/2 lg:w-1/3 p-4 flex">
+              <Card {...service} noOuterWrapper />
+            </ScrollRevealCard>
           ))}
         </div>
 
@@ -115,23 +123,9 @@ export default function Services() {
           </motion.div>
           <div className="flex flex-wrap -mx-4" style={{ perspective: 800 }}>
             {chooseUs.map((service, index) => (
-              <motion.div
-                key={index}
-                className="w-full md:w-1/2 lg:w-1/3 flex"
-                style={{ transformStyle: 'preserve-3d' }}
-                initial={{ opacity: 0, y: 50, rotateX: 6 }}
-                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{
-                  duration: 0.8,
-                  delay: index * 0.12,
-                  ease: easeOut,
-                }}
-              >
-                <div className="p-4 flex w-full" style={{ transform: 'translateZ(20px)' }}>
-                  <Card {...service} noOuterWrapper />
-                </div>
-              </motion.div>
+              <ScrollRevealCard key={index} index={index} scrollYProgress={scrollYProgress} className="w-full md:w-1/2 lg:w-1/3 p-4 flex">
+                <Card {...service} noOuterWrapper />
+              </ScrollRevealCard>
             ))}
           </div>
         </div>

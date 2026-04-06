@@ -13,6 +13,8 @@ import CursorGlow from "./_components/CursorGlow";
 import MarqueeBanner from "./_components/MarqueeBanner";
 import PageIntro from "./_components/PageIntro";
 import ParallaxOrbs from "./_components/ParallaxOrbs";
+import ScrollDivider from "./_components/ScrollDivider";
+import ScrollIndicator from "./_components/ScrollIndicator";
 
 export default function Home() {
   return (
@@ -21,20 +23,21 @@ export default function Home() {
       <ParallaxOrbs />
       <ScrollProgress />
       <CursorGlow />
+      <ScrollIndicator />
       <NavbarAndHero />
       <HeroSection />
       <StatsSection />
       <MarqueeBanner />
       <Service />
-      <div className="section-divider" />
+      <ScrollDivider direction="left" />
       <TechStack />
-      <div className="section-divider" />
+      <ScrollDivider direction="right" />
       <ProcessSection />
-      <div className="section-divider" />
+      <ScrollDivider />
       <AboutUs />
-      <div className="section-divider" />
+      <ScrollDivider direction="left" />
       <TestimonialsSection />
-      <div className="section-divider" />
+      <ScrollDivider direction="right" />
       <ContactUs />
       <Footer />
     </main>

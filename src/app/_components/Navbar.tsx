@@ -63,11 +63,11 @@ const NavbarAndHero = () => {
   const menuItems = useMemo(
     () => [
       { label: 'Home', href: '/' },
-      { label: 'Services', href: '/#Services' },
+      { label: 'Services', href: '/#services' },
       { label: 'Projects', href: '/projects' },
       { label: 'Blog', href: '/blog' },
-      { label: 'About', href: '/#About' },
-      { label: 'Contact', href: '/#Contact' },
+      { label: 'About', href: '/#about' },
+      { label: 'Contact', href: '/#contact' },
     ],
     []
   );

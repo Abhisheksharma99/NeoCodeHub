@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   FaReact, FaNodeJs, FaAngular, FaPython, FaPhp, FaSwift,
   FaLaravel, FaMagento, FaShopify, FaJava
@@ -10,7 +10,7 @@ import {
   SiGraphql, SiRedux, SiTailwindcss, SiPostgresql, SiAmazon,
   SiJenkins, SiElasticsearch, SiSass
 } from 'react-icons/si';
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 
@@ -43,15 +43,23 @@ const techs = [
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
+function WaveItem({ children, index, scrollYProgress }: { children: React.ReactNode; index: number; scrollYProgress: MotionValue<number> }) {
+  const row = Math.floor(index / 6);
+  const offset = useTransform(scrollYProgress, [0, 1], [25 + row * 8, -25 - row * 8]);
+  return <motion.div style={{ y: offset }}>{children}</motion.div>;
+}
+
 const TechStack = () => {
   const [search, setSearch] = useState("");
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
 
   const filteredTechs = techs.filter(tech =>
     tech.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <section id="Tech" className="relative">
+    <section id="tech" className="relative" ref={sectionRef}>
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28">
         {/* Section Header */}
         <motion.div
@@ -91,35 +99,36 @@ const TechStack = () => {
         {/* Tech Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4" style={{ perspective: 800 }}>
           {filteredTechs.map((tech, index) => (
-            <motion.div
-              key={tech.name}
-              className="group"
-              style={{ transformStyle: 'preserve-3d' }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.6, delay: index * 0.03, ease: easeOut }}
-              whileHover={{ scale: 1.06, rotateY: 12 }}
-            >
-              <div
-                className="flex flex-col items-center justify-center py-5 px-3 rounded-2xl bg-white/60 backdrop-blur-sm border border-neutral-100/80 hover:border-neutral-200 hover:bg-white/90 hover:shadow-md transition-all duration-300 cursor-default"
-                data-tooltip-id={`tooltip-${tech.name}`}
+            <WaveItem key={tech.name} index={index} scrollYProgress={scrollYProgress}>
+              <motion.div
+                className="group"
+                style={{ transformStyle: 'preserve-3d' }}
+                initial={{ opacity: 0, scale: 0.8, y: 30 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: index * 0.03, ease: easeOut }}
+                whileHover={{ scale: 1.06, rotateY: 12 }}
               >
-                <div className="text-3xl text-neutral-600 group-hover:text-neutral-900 transition-colors duration-200 mb-2">
-                  {tech.icon}
+                <div
+                  className="flex flex-col items-center justify-center py-5 px-3 rounded-2xl bg-white/60 backdrop-blur-sm border border-neutral-100/80 hover:border-neutral-200 hover:bg-white/90 hover:shadow-md transition-all duration-300 cursor-default"
+                  data-tooltip-id={`tooltip-${tech.name}`}
+                >
+                  <div className="text-3xl text-neutral-600 group-hover:text-neutral-900 transition-colors duration-200 mb-2">
+                    {tech.icon}
+                  </div>
+                  <p className="text-xs font-medium text-neutral-700 group-hover:text-neutral-900 transition-colors text-center leading-tight">
+                    {tech.name}
+                  </p>
                 </div>
-                <p className="text-xs font-medium text-neutral-700 group-hover:text-neutral-900 transition-colors text-center leading-tight">
-                  {tech.name}
-                </p>
-              </div>
-              <ReactTooltip
-                id={`tooltip-${tech.name}`}
-                place="top"
-                className="!rounded-lg !text-xs !px-3 !py-2 !bg-neutral-900 !text-white"
-              >
-                {tech.description}
-              </ReactTooltip>
-            </motion.div>
+                <ReactTooltip
+                  id={`tooltip-${tech.name}`}
+                  place="top"
+                  className="!rounded-lg !text-xs !px-3 !py-2 !bg-neutral-900 !text-white"
+                >
+                  {tech.description}
+                </ReactTooltip>
+              </motion.div>
+            </WaveItem>
           ))}
         </div>
 

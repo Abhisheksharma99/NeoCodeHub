@@ -103,7 +103,7 @@ function StackingCard({
 
 export default function TestimonialsSection() {
   return (
-    <section className="relative">
+    <section id="testimonials" className="relative">
       {/* Section Header */}
       <div className="container mx-auto px-6 lg:px-8 pt-20 md:pt-28">
         <motion.div

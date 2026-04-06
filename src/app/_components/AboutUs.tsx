@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useRef, useState, useCallback, useMemo } from 'react';
+import Image from 'next/image';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Card, ServiceData } from './Card';
 import Innovation from '../assets/Visionary technology-bro.svg';
 import Quality from '../assets/Quality.svg';
 import Collaboration from '../assets/Partnership-bro.svg';
-import { IoLeaf } from 'react-icons/io5';
-import { FaCloud, FaMobileAlt, FaGlobe } from 'react-icons/fa';
+import { IoLeaf, IoRocket } from 'react-icons/io5';
+import { FaCloud, FaMobileAlt, FaGlobe, FaCubes } from 'react-icons/fa';
 import { GiArtificialIntelligence } from 'react-icons/gi';
+import ParallaxDoodle from './ParallaxDoodle';
 
 const timeline = [
   {
@@ -63,12 +65,36 @@ const timeline = [
     year: 2024,
     title: 'Future-Ready Innovation',
     description:
-      'We focus on sustainability and future-ready technologies like blockchain...',
+      'We focused on sustainability and future-ready technologies like blockchain, building eco-friendly digital infrastructure for forward-thinking clients.',
     service: {
       title: 'Sustainable Tech Solutions',
       description:
         'We integrate eco-friendly practices and energy-efficient digital infrastructures...',
       icon: <IoLeaf />,
+    },
+  },
+  {
+    year: 2025,
+    title: 'AI-First Product Studio',
+    description:
+      'We evolved into a full-spectrum product studio, shipping AI-powered SaaS platforms, intelligent automation pipelines, and LLM-integrated applications for startups and enterprises.',
+    service: {
+      title: 'AI Product Development',
+      description:
+        'End-to-end AI product builds — from model selection and fine-tuning to production-grade APIs and user-facing interfaces powered by large language models.',
+      icon: <FaCubes />,
+    },
+  },
+  {
+    year: 2026,
+    title: 'Scaling Global Impact',
+    description:
+      'Expanding our reach with a distributed team across time zones, delivering high-velocity engineering for clients worldwide — from seed-stage startups to Fortune 500 digital transformation initiatives.',
+    service: {
+      title: 'End-to-End Digital Ventures',
+      description:
+        'Full lifecycle partnerships — strategy, design, engineering, DevOps, and growth — turning ambitious ideas into market-ready products at startup speed.',
+      icon: <IoRocket />,
     },
   },
 ];
@@ -98,6 +124,12 @@ const easeOut = [0.16, 1, 0.3, 1] as const;
 
 export default function AboutUs() {
   const [selectedYear, setSelectedYear] = useState(timeline[timeline.length - 1]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+
+  // Scroll-linked value cards entrance
+  const valuesOpacity = useTransform(scrollYProgress, [0.45, 0.6], [0, 1]);
+  const valuesY = useTransform(scrollYProgress, [0.45, 0.6], [80, 0]);
 
   const handleYearSelect = useCallback((yearIndex: number) => {
     setSelectedYear(timeline[yearIndex]);
@@ -131,7 +163,11 @@ export default function AboutUs() {
   );
 
   return (
-    <section id="About" className="relative">
+    <section id="about" className="relative overflow-hidden" ref={sectionRef}>
+      <ParallaxDoodle speed={-0.1} className="absolute bottom-24 right-[6%] hidden lg:block z-0 opacity-15 pointer-events-none">
+        <Image src={Collaboration} alt="" width={140} height={140} />
+      </ParallaxDoodle>
+
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28">
         {/* Section Header */}
         <motion.div
@@ -235,27 +271,21 @@ export default function AboutUs() {
               Our Values
             </h3>
           </motion.div>
-          <div className="flex flex-wrap -mx-4" style={{ perspective: 800 }}>
-            {values.map((value, index) => (
-              <motion.div
-                key={index}
-                className="w-full md:w-1/2 lg:w-1/3 flex"
-                style={{ transformStyle: 'preserve-3d' }}
-                initial={{ opacity: 0, y: 50, rotateX: 6 }}
-                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{
-                  duration: 0.8,
-                  delay: index * 0.12,
-                  ease: easeOut,
-                }}
-              >
-                <div className="p-4 flex w-full" style={{ transform: 'translateZ(20px)' }}>
-                  <Card {...value} noOuterWrapper />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <motion.div style={{ opacity: valuesOpacity, y: valuesY }}>
+            <div className="flex flex-wrap -mx-4" style={{ perspective: 800 }}>
+              {values.map((value, index) => (
+                <motion.div
+                  key={index}
+                  className="w-full md:w-1/2 lg:w-1/3 flex"
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  <div className="p-4 flex w-full" style={{ transform: 'translateZ(20px)' }}>
+                    <Card {...value} noOuterWrapper />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
