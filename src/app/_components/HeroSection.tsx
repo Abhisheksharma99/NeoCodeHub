@@ -7,7 +7,7 @@ import Link from "next/link";
 import HeroImage from "../assets/HeroImage.svg";
 import { motion, useScroll, useTransform } from "framer-motion";
 import ContactButton from "./ContactButton";
-import MagneticButton from "./MagneticButton";
+import MagneticButton from './MagneticButton';
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 

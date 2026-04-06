@@ -1,8 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { FaAngular, FaDatabase, FaNode, FaPython, FaReact } from 'react-icons/fa';
 import { Button } from './Button';
 import contactUs from '../assets/contactUs.svg'
@@ -28,7 +27,8 @@ interface FormErrors {
   message: string
 }
 
-const easeOut = [0.16, 1, 0.3, 1] as const;
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+const RATE_LIMIT_MS = 60000 // 1 minute between submissions
 
 export default function ContactUs() {
   const [formData, setFormData] = useState({
@@ -42,7 +42,9 @@ export default function ContactUs() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [activeIcon, setActiveIcon] = useState(0)
+  const lastSubmitTime = useRef(0)
 
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
@@ -62,23 +64,53 @@ export default function ContactUs() {
     return () => clearInterval(interval)
   }, [])
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const formErrors: FormErrors = { name: '', email: '', phone: '', message: '' }
-    if (!formData.name.trim()) formErrors.name = "Name is required"
-    if (!formData.email.trim()) formErrors.email = "Email is required"
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) formErrors.email = "Email is invalid"
-    if (!formData.phone.trim()) formErrors.phone = "Phone number is required"
-    if (!formData.message.trim()) formErrors.message = "Message is required"
+    let hasError = false
+
+    if (!formData.name.trim()) {
+      formErrors.name = "Name is required"
+      hasError = true
+    } else if (formData.name.trim().length > 100) {
+      formErrors.name = "Name is too long"
+      hasError = true
+    }
+
+    if (!formData.email.trim()) {
+      formErrors.email = "Email is required"
+      hasError = true
+    } else if (!EMAIL_REGEX.test(formData.email)) {
+      formErrors.email = "Please enter a valid email address"
+      hasError = true
+    }
+
+    if (!formData.phone.trim()) {
+      formErrors.phone = "Phone number is required"
+      hasError = true
+    } else if (formData.phone.replace(/\D/g, '').length < 7) {
+      formErrors.phone = "Please enter a valid phone number"
+      hasError = true
+    }
+
+    if (!formData.message.trim()) {
+      formErrors.message = "Message is required"
+      hasError = true
+    } else if (formData.message.trim().length > 2000) {
+      formErrors.message = "Message is too long (max 2000 characters)"
+      hasError = true
+    }
+
     setErrors(formErrors)
-    return Object.keys(formErrors).length === 0
-  }
+    return !hasError
+  }, [formData])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prevState => ({ ...prevState, [name]: value }))
-    if (errors.name) {
+    if (errors[name as keyof FormErrors]) {
       setErrors(prevErrors => ({ ...prevErrors, [name]: '' }))
     }
+    setSubmitError('')
   }
 
   const handlePhoneChange = (value: string) => {
@@ -90,20 +122,29 @@ export default function ContactUs() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitError('')
+
+    // Rate limiting
+    const now = Date.now()
+    if (now - lastSubmitTime.current < RATE_LIMIT_MS) {
+      setSubmitError('Please wait a moment before submitting again.')
+      return
+    }
+
     if (validateForm()) {
       setIsSubmitting(true)
       try {
         await emailjs.send(
-          'YOUR_SERVICE_ID',
-          'YOUR_TEMPLATE_ID',
+          process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '',
+          process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '',
           formData,
-          'YOUR_USER_ID'
+          process.env.NEXT_PUBLIC_EMAILJS_USER_ID || ''
         )
+        lastSubmitTime.current = Date.now()
         setIsSubmitted(true)
         setFormData({ name: '', email: '', phone: '', message: '' })
-      } catch (error) {
-        console.error('Error sending email:', error)
-        alert('Failed to send message. Please try again.')
+      } catch {
+        setSubmitError('Failed to send message. Please try again later.')
       }
       setIsSubmitting(false)
     }
@@ -131,31 +172,18 @@ export default function ContactUs() {
 
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28 relative z-10">
         {/* Section Header */}
-        <motion.div
-          className="text-center mb-16"
-          style={{ perspective: 800 }}
-          initial={{ opacity: 0, y: 40, rotateX: 8 }}
-          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.8, ease: easeOut }}
-        >
-          <span className="inline-block px-4 py-1.5 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-neutral-700 mb-6 border border-neutral-200/80">
+        <div className="text-center mb-16">
+          <span className="inline-block px-4 py-1.5 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-neutral-500 mb-6 border border-neutral-200/80">
             Get In Touch
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
+          <h2 id="contact-heading" className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
             Contact Us
           </h2>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="flex flex-col lg:flex-row items-start gap-8 max-w-5xl mx-auto"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="flex flex-col lg:flex-row items-start gap-8 max-w-5xl mx-auto">
           {/* Left: Tech Icons */}
-          <div className="w-full lg:w-48 shrink-0">
+          <div className="w-full lg:w-48 shrink-0" aria-hidden="true">
             <div className="flex lg:flex-col items-center justify-center gap-3">
               {icons.map((icon, index) => (
                 <motion.div
@@ -165,7 +193,7 @@ export default function ContactUs() {
                     ? { opacity: 1, scale: 1.1 }
                     : { opacity: 0.4, scale: 0.85 }
                   }
-                  transition={{ duration: 0.4, ease: easeOut }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <div className={`w-14 h-14 flex items-center justify-center text-3xl rounded-2xl transition-all duration-300 ${
                     activeIcon === index
@@ -314,7 +342,7 @@ export default function ContactUs() {
               </motion.div>
             </motion.div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

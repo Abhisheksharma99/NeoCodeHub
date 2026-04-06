@@ -64,7 +64,7 @@ const NavbarAndHero = () => {
     () => [
       { label: 'Home', href: '/' },
       { label: 'Services', href: '/#services' },
-      { label: 'Projects', href: '/projects' },
+      { label: 'Portfolio', href: '/portfolio' },
       { label: 'Blog', href: '/blog' },
       { label: 'About', href: '/#about' },
       { label: 'Contact', href: '/#contact' },
@@ -162,47 +162,29 @@ const NavbarAndHero = () => {
                     isMobile ? 'flex-col' : 'flex-row'
                   } items-center space-y-1 md:space-y-0 md:space-x-1`}
                 >
-                  {menuItems.map((item, index) => {
-                    const isPageLink = item.href.startsWith('/') && !item.href.includes('#');
-                    return (
-                      <motion.li
-                        key={item.label}
-                        variants={linkVariants}
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                        transition={{ duration: 0.25, delay: index * 0.05 }}
+                  {menuItems.map((item, index) => (
+                    <motion.li
+                      key={item.label}
+                      variants={linkVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      transition={{ duration: 0.25, delay: index * 0.05 }}
+                    >
+                      <Link
+                        href={item.href}
+                        className={`block py-2 px-4 text-[0.9rem] font-heading font-medium tracking-tight rounded-lg transition-all duration-200 ${
+                          activeLink === item.label
+                            ? 'text-neutral-900 bg-neutral-100'
+                            : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
+                        }`}
+                        onClick={() => handleLinkClick(item.label)}
+                        aria-current={activeLink === item.label ? 'page' : undefined}
                       >
-                        {isPageLink ? (
-                          <Link
-                            href={item.href}
-                            className={`block py-2 px-4 text-[0.9rem] font-heading font-medium tracking-tight rounded-lg transition-all duration-200 ${
-                              activeLink === item.label
-                                ? 'text-neutral-900 bg-neutral-100'
-                                : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50'
-                            }`}
-                            onClick={() => handleLinkClick(item.label)}
-                            aria-current={activeLink === item.label ? 'page' : undefined}
-                          >
-                            {item.label}
-                          </Link>
-                        ) : (
-                          <a
-                            href={item.href}
-                            className={`block py-2 px-4 text-[0.9rem] font-heading font-medium tracking-tight rounded-lg transition-all duration-200 ${
-                              activeLink === item.label
-                                ? 'text-neutral-900 bg-neutral-100'
-                                : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50'
-                            }`}
-                            onClick={() => handleLinkClick(item.label)}
-                            aria-current={activeLink === item.label ? 'page' : undefined}
-                          >
-                            {item.label}
-                          </a>
-                        )}
-                      </motion.li>
-                    );
-                  })}
+                        {item.label}
+                      </Link>
+                    </motion.li>
+                  ))}
                 </ul>
 
                 {isMobile && (

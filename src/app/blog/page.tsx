@@ -3,13 +3,13 @@ import { readData } from '@/lib/data';
 import BlogClient from './BlogClient';
 
 export const metadata: Metadata = {
-  title: 'Our Blog | NeoCodeHub',
+  title: 'Blog | NeoCodeHub',
   description:
-    'Insights, tutorials, and industry trends from the NeoCodeHub team. Stay up to date with the latest in web development, AI, and software engineering.',
+    'Insights, tutorials, and industry perspectives from the NeoCodeHub team. Stay ahead with the latest trends in technology and development.',
   openGraph: {
-    title: 'Our Blog | NeoCodeHub',
+    title: 'Blog | NeoCodeHub',
     description:
-      'Insights, tutorials, and industry trends from the NeoCodeHub team.',
+      'Insights, tutorials, and industry perspectives from the NeoCodeHub team.',
     type: 'website',
   },
 };

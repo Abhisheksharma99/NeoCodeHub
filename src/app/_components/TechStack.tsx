@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useMemo, useCallback } from "react";
 import {
   FaReact, FaNodeJs, FaAngular, FaPython, FaPhp, FaSwift,
   FaLaravel, FaMagento, FaShopify, FaJava
@@ -13,6 +13,7 @@ import {
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
+import debounce from "lodash.debounce";
 
 const techs = [
   { icon: <FaReact />, name: "React", description: "A JavaScript library for building UIs." },
@@ -51,30 +52,37 @@ function WaveItem({ children, index, scrollYProgress }: { children: React.ReactN
 
 const TechStack = () => {
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
 
-  const filteredTechs = techs.filter(tech =>
-    tech.name.toLowerCase().includes(search.toLowerCase())
+  const debouncedSetSearch = useMemo(
+    () => debounce((value: string) => setDebouncedSearch(value), 300),
+    []
+  );
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    debouncedSetSearch(e.target.value);
+  }, [debouncedSetSearch]);
+
+  const filteredTechs = useMemo(
+    () => techs.filter(tech =>
+      tech.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+    ),
+    [debouncedSearch]
   );
 
   return (
-    <section id="tech" className="relative" ref={sectionRef}>
+    <section id="tech" className="relative" ref={sectionRef} aria-labelledby="tech-heading">
       <div className="container mx-auto px-6 lg:px-8 py-20 md:py-28">
         {/* Section Header */}
-        <motion.div
-          className="text-center mb-14"
-          style={{ perspective: 800 }}
-          initial={{ opacity: 0, y: 40, rotateX: 8 }}
-          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.8, ease: easeOut }}
-        >
+        <div className="text-center mb-14">
           <span className="section-badge">Technologies</span>
-          <h2 className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
+          <h2 id="tech-heading" className="text-3xl md:text-5xl font-bold font-heading tracking-tight text-neutral-900">
             Our Technology Stack
           </h2>
-          <p className="text-neutral-700 text-lg mt-4 max-w-2xl mx-auto leading-relaxed mb-8">
+          <p className="text-neutral-400 text-lg mt-4 max-w-2xl mx-auto leading-relaxed mb-8">
             We are adept at all possible tech stacks for both web and mobile,
             as well as a wide range of platforms, languages, and database systems.
           </p>
@@ -82,22 +90,23 @@ const TechStack = () => {
           {/* Search Input */}
           <div className="max-w-md mx-auto relative">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <svg className="w-4 h-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
             <input
               type="text"
               placeholder="Search technology..."
-              className="w-full pl-11 pr-4 py-3 bg-white/80 backdrop-blur-sm border border-neutral-200 rounded-full text-sm font-body text-neutral-700 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-300 transition-all shadow-sm"
+              className="w-full pl-11 pr-4 py-3 bg-white/80 backdrop-blur-sm border border-neutral-200 rounded-full text-sm font-body text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-300 transition-all shadow-sm"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={handleSearchChange}
+              aria-label="Search technologies"
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* Tech Grid */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4" style={{ perspective: 800 }}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4">
           {filteredTechs.map((tech, index) => (
             <WaveItem key={tech.name} index={index} scrollYProgress={scrollYProgress}>
               <motion.div
@@ -133,7 +142,7 @@ const TechStack = () => {
         </div>
 
         {filteredTechs.length === 0 && (
-          <p className="text-center text-neutral-600 mt-12 text-sm">
+          <p className="text-center text-neutral-400 mt-12 text-sm" role="status">
             No technologies found matching &ldquo;{search}&rdquo;
           </p>
         )}
